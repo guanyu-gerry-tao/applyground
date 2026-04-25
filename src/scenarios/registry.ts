@@ -1,15 +1,15 @@
 import type { ComponentType } from 'react';
 import type { ScenarioId } from '../types/scenario';
-import SimpleCompanyForm from './company-careers/SimpleCompanyForm';
-import CompanyScreeningForm from './company-careers/CompanyScreeningForm';
-import EasyApplyStyle from './easy-apply/EasyApplyStyle';
-import EasyApplyQuickFlow from './easy-apply/EasyApplyQuickFlow';
-import EnterpriseAtsStyle from './workday-style/EnterpriseAtsStyle';
-import EnterpriseAtsShort from './workday-style/EnterpriseAtsShort';
-import ModernAtsStyle from './modern-ats/ModernAtsStyle';
-import ModernAtsLinks from './modern-ats/ModernAtsLinks';
-import HostileEdgeCases from './edge-cases/HostileEdgeCases';
-import MildEdgeCases from './edge-cases/MildEdgeCases';
+import SimpleCompanyForm from './company-careers/simple-company-form';
+import CompanyScreeningForm from './company-careers/company-screening-form';
+import EasyApplyStyle from './easy-apply/easy-apply-style';
+import EasyApplyQuickFlow from './easy-apply/easy-apply-quickflow';
+import EnterpriseAtsStyle from './workday-style/enterprise-ats-style';
+import EnterpriseAtsShort from './workday-style/enterprise-ats-short';
+import ModernAtsStyle from './modern-ats/modern-ats-style';
+import ModernAtsLinks from './modern-ats/modern-ats-links';
+import HostileEdgeCases from './edge-cases/hostile-edge-cases';
+import MildEdgeCases from './edge-cases/mild-edge-cases';
 
 export type ScenarioComponent = ComponentType;
 

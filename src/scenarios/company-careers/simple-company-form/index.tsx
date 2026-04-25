@@ -1,27 +1,23 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Field, SelectField, TextareaField } from '../../components/Field';
-import FileInput from '../../components/FileInput';
-import ScenarioFrame from '../../components/ScenarioFrame';
-import ValidationSummary from '../../components/ValidationSummary';
-import { findScenarioMeta } from '../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../lib/submission';
+import {
+  CheckboxField,
+  Field,
+  RadioGroup,
+} from '../../../components/Field';
+import FileInput from '../../../components/FileInput';
+import ScenarioFrame from '../../../components/ScenarioFrame';
+import ValidationSummary from '../../../components/ValidationSummary';
+import { findScenarioMeta } from '../../../data/scenarios';
+import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
-} from '../../types/scenario';
+} from '../../../types/scenario';
 
-const SCENARIO_ID = 'modern-ats-style' as const;
+const SCENARIO_ID = 'simple-company-form' as const;
 
-const NOTICE_OPTIONS = [
-  { value: 'immediate', label: 'Immediate' },
-  { value: '2w', label: '2 weeks' },
-  { value: '1m', label: '1 month' },
-  { value: '2m', label: '2 months' },
-  { value: '3m+', label: '3 months or more' },
-];
-
-export default function ModernAtsStyle() {
+export default function SimpleCompanyForm() {
   const meta = findScenarioMeta(SCENARIO_ID);
   if (!meta) throw new Error(`Scenario meta missing: ${SCENARIO_ID}`);
   const navigate = useNavigate();
@@ -30,10 +26,10 @@ export default function ModernAtsStyle() {
     fullName: '',
     email: '',
     phone: '',
-    linkedinUrl: '',
-    githubUrl: '',
-    whyInterested: '',
-    noticePeriod: '',
+    location: '',
+    portfolioUrl: '',
+    workAuthorization: '',
+    confirmAccurate: '',
   });
   const [files, setFiles] = useState<SubmissionFileMetadata[]>([]);
   const [validation, setValidation] = useState<SubmissionValidationResult | null>(null);
@@ -53,7 +49,6 @@ export default function ModernAtsStyle() {
   return (
     <ScenarioFrame meta={meta}>
       <form onSubmit={handleSubmit} noValidate>
-        <h3>Contact</h3>
         <Field
           name="fullName"
           label="Full name"
@@ -79,8 +74,14 @@ export default function ModernAtsStyle() {
           onChange={(v) => setField('phone', v)}
           autoComplete="tel"
         />
-
-        <h3>Files</h3>
+        <Field
+          name="location"
+          label="Current location"
+          required
+          value={fields.location}
+          onChange={(v) => setField('location', v)}
+          autoComplete="address-level2"
+        />
         <FileInput
           name="resume"
           label="Resume"
@@ -91,49 +92,29 @@ export default function ModernAtsStyle() {
             setFiles((prev) => [...prev.filter((f) => f.field !== 'resume'), ...next])
           }
         />
-        <FileInput
-          name="coverLetter"
-          label="Cover letter (optional)"
-          accept=".pdf,.doc,.docx,.txt"
-          value={files.filter((f) => f.field === 'coverLetter')}
-          onChange={(next) =>
-            setFiles((prev) => [...prev.filter((f) => f.field !== 'coverLetter'), ...next])
-          }
-        />
-
-        <h3>Links (optional)</h3>
         <Field
-          name="linkedinUrl"
-          label="LinkedIn URL"
+          name="portfolioUrl"
+          label="Portfolio or profile URL"
           kind="url"
-          value={fields.linkedinUrl}
-          onChange={(v) => setField('linkedinUrl', v)}
+          value={fields.portfolioUrl}
+          onChange={(v) => setField('portfolioUrl', v)}
         />
-        <Field
-          name="githubUrl"
-          label="GitHub URL"
-          kind="url"
-          value={fields.githubUrl}
-          onChange={(v) => setField('githubUrl', v)}
-        />
-
-        <h3>Short answers</h3>
-        <TextareaField
-          name="whyInterested"
-          label="Why are you interested in this role?"
+        <RadioGroup
+          name="workAuthorization"
+          label="Are you authorized to work in the listed location?"
           required
-          rows={4}
-          value={fields.whyInterested}
-          onChange={(v) => setField('whyInterested', v)}
+          value={fields.workAuthorization}
+          onChange={(v) => setField('workAuthorization', v)}
+          options={[
+            { value: 'yes', label: 'Yes' },
+            { value: 'no', label: 'No' },
+          ]}
         />
-        <SelectField
-          name="noticePeriod"
-          label="Current notice period"
-          required
-          value={fields.noticePeriod}
-          onChange={(v) => setField('noticePeriod', v)}
-          options={NOTICE_OPTIONS}
-          placeholder="Select…"
+        <CheckboxField
+          name="confirmAccurate"
+          label="The information I have provided is accurate."
+          checked={fields.confirmAccurate === 'yes'}
+          onChange={(c) => setField('confirmAccurate', c ? 'yes' : '')}
         />
 
         <ValidationSummary validation={validation} />

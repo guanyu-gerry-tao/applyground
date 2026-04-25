@@ -4,17 +4,17 @@ import {
   Field,
   RadioGroup,
   SelectField,
-} from '../../components/Field';
-import FileInput from '../../components/FileInput';
-import MultiStepModal from '../../components/MultiStepModal';
-import ScenarioFrame from '../../components/ScenarioFrame';
-import ValidationSummary from '../../components/ValidationSummary';
-import { findScenarioMeta } from '../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../lib/submission';
+} from '../../../components/Field';
+import FileInput from '../../../components/FileInput';
+import MultiStepModal from '../../../components/MultiStepModal';
+import ScenarioFrame from '../../../components/ScenarioFrame';
+import ValidationSummary from '../../../components/ValidationSummary';
+import { findScenarioMeta } from '../../../data/scenarios';
+import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
-} from '../../types/scenario';
+} from '../../../types/scenario';
 
 const SCENARIO_ID = 'easy-apply-style' as const;
 

@@ -4,54 +4,37 @@ import {
   Field,
   RadioGroup,
   SelectField,
-  TextareaField,
-} from '../../components/Field';
-import FileInput from '../../components/FileInput';
-import ScenarioFrame from '../../components/ScenarioFrame';
-import ValidationSummary from '../../components/ValidationSummary';
-import WizardSteps from '../../components/WizardSteps';
-import { findScenarioMeta } from '../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../lib/submission';
+} from '../../../components/Field';
+import FileInput from '../../../components/FileInput';
+import ScenarioFrame from '../../../components/ScenarioFrame';
+import ValidationSummary from '../../../components/ValidationSummary';
+import WizardSteps from '../../../components/WizardSteps';
+import { findScenarioMeta } from '../../../data/scenarios';
+import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
-} from '../../types/scenario';
+} from '../../../types/scenario';
 
-const SCENARIO_ID = 'enterprise-ats-style' as const;
+const SCENARIO_ID = 'enterprise-ats-short' as const;
 
 const STEPS = [
   { id: 'personal', label: 'Personal information' },
-  { id: 'address', label: 'Address' },
-  { id: 'eligibility', label: 'Eligibility' },
-  { id: 'self-id', label: 'Optional self-identification' },
-  { id: 'resume', label: 'Resume and review' },
+  { id: 'review', label: 'Eligibility and resume' },
 ];
 
 const COUNTRY_OPTIONS = [
   { value: 'AU', label: 'Australia' },
-  { value: 'BR', label: 'Brazil' },
   { value: 'CA', label: 'Canada' },
-  { value: 'CN', label: 'China' },
   { value: 'DE', label: 'Germany' },
-  { value: 'FR', label: 'France' },
   { value: 'IN', label: 'India' },
   { value: 'JP', label: 'Japan' },
-  { value: 'NL', label: 'Netherlands' },
   { value: 'US', label: 'United States' },
   { value: 'GB', label: 'United Kingdom' },
   { value: 'OTHER', label: 'Other' },
 ];
 
-const EDUCATION_OPTIONS = [
-  { value: 'high-school', label: 'High school' },
-  { value: 'associate', label: 'Associate degree' },
-  { value: 'bachelor', label: 'Bachelor’s degree' },
-  { value: 'master', label: 'Master’s degree' },
-  { value: 'doctorate', label: 'Doctorate' },
-  { value: 'other', label: 'Other' },
-];
-
-export default function EnterpriseAtsStyle() {
+export default function EnterpriseAtsShort() {
   const meta = findScenarioMeta(SCENARIO_ID);
   if (!meta) throw new Error(`Scenario meta missing: ${SCENARIO_ID}`);
   const navigate = useNavigate();
@@ -62,18 +45,9 @@ export default function EnterpriseAtsStyle() {
     lastName: '',
     email: '',
     phone: '',
-    addressLine1: '',
     city: '',
-    region: '',
-    postalCode: '',
     country: '',
-    preferredStart: '',
     workAuthorization: '',
-    requiresSponsorship: '',
-    highestEducation: '',
-    optionalGenderSelfId: '',
-    optionalRaceSelfId: '',
-    additionalNotes: '',
   });
   const [files, setFiles] = useState<SubmissionFileMetadata[]>([]);
   const [validation, setValidation] = useState<SubmissionValidationResult | null>(null);
@@ -82,34 +56,15 @@ export default function EnterpriseAtsStyle() {
     setFields((prev) => ({ ...prev, [k]: v }));
 
   const totalSteps = STEPS.length;
-
-  const stepValid = (() => {
-    if (step === 0)
-      return (
-        !!fields.firstName.trim() &&
+  const stepValid =
+    step === 0
+      ? !!fields.firstName.trim() &&
         !!fields.lastName.trim() &&
         !!fields.email.trim() &&
-        !!fields.phone.trim()
-      );
-    if (step === 1)
-      return (
-        !!fields.addressLine1.trim() &&
+        !!fields.phone.trim() &&
         !!fields.city.trim() &&
-        !!fields.region.trim() &&
-        !!fields.postalCode.trim() &&
         !!fields.country.trim()
-      );
-    if (step === 2)
-      return (
-        !!fields.preferredStart.trim() &&
-        !!fields.workAuthorization.trim() &&
-        !!fields.requiresSponsorship.trim() &&
-        !!fields.highestEducation.trim()
-      );
-    if (step === 3) return true;
-    if (step === 4) return !!files.find((f) => f.field === 'resume');
-    return false;
-  })();
+      : !!fields.workAuthorization.trim() && !!files.find((f) => f.field === 'resume');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,20 +116,6 @@ export default function EnterpriseAtsStyle() {
               onChange={(v) => setField('phone', v)}
               autoComplete="tel"
             />
-          </fieldset>
-        )}
-
-        {step === 1 && (
-          <fieldset data-step="address">
-            <legend>Address</legend>
-            <Field
-              name="addressLine1"
-              label="Street address"
-              required
-              value={fields.addressLine1}
-              onChange={(v) => setField('addressLine1', v)}
-              autoComplete="address-line1"
-            />
             <Field
               name="city"
               label="City"
@@ -182,22 +123,6 @@ export default function EnterpriseAtsStyle() {
               value={fields.city}
               onChange={(v) => setField('city', v)}
               autoComplete="address-level2"
-            />
-            <Field
-              name="region"
-              label="State / region"
-              required
-              value={fields.region}
-              onChange={(v) => setField('region', v)}
-              autoComplete="address-level1"
-            />
-            <Field
-              name="postalCode"
-              label="Postal code"
-              required
-              value={fields.postalCode}
-              onChange={(v) => setField('postalCode', v)}
-              autoComplete="postal-code"
             />
             <SelectField
               name="country"
@@ -211,17 +136,9 @@ export default function EnterpriseAtsStyle() {
           </fieldset>
         )}
 
-        {step === 2 && (
-          <fieldset data-step="eligibility">
-            <legend>Eligibility</legend>
-            <Field
-              name="preferredStart"
-              label="Preferred start date"
-              kind="date"
-              required
-              value={fields.preferredStart}
-              onChange={(v) => setField('preferredStart', v)}
-            />
+        {step === 1 && (
+          <fieldset data-step="review">
+            <legend>Eligibility and resume</legend>
             <RadioGroup
               name="workAuthorization"
               label="Are you authorized to work in the listed location?"
@@ -233,54 +150,6 @@ export default function EnterpriseAtsStyle() {
                 { value: 'no', label: 'No' },
               ]}
             />
-            <RadioGroup
-              name="requiresSponsorship"
-              label="Will you now or in the future require sponsorship for employment?"
-              required
-              value={fields.requiresSponsorship}
-              onChange={(v) => setField('requiresSponsorship', v)}
-              options={[
-                { value: 'yes', label: 'Yes' },
-                { value: 'no', label: 'No' },
-              ]}
-            />
-            <SelectField
-              name="highestEducation"
-              label="Highest education completed"
-              required
-              value={fields.highestEducation}
-              onChange={(v) => setField('highestEducation', v)}
-              options={EDUCATION_OPTIONS}
-              placeholder="Select…"
-            />
-          </fieldset>
-        )}
-
-        {step === 3 && (
-          <fieldset data-step="self-id">
-            <legend>Optional self-identification</legend>
-            <p>
-              These questions are optional. They are included to mirror the shape of common
-              ATS forms. Skipping them is fine.
-            </p>
-            <Field
-              name="optionalGenderSelfId"
-              label="Gender (optional)"
-              value={fields.optionalGenderSelfId}
-              onChange={(v) => setField('optionalGenderSelfId', v)}
-            />
-            <Field
-              name="optionalRaceSelfId"
-              label="Race / ethnicity (optional)"
-              value={fields.optionalRaceSelfId}
-              onChange={(v) => setField('optionalRaceSelfId', v)}
-            />
-          </fieldset>
-        )}
-
-        {step === 4 && (
-          <fieldset data-step="resume">
-            <legend>Resume and review</legend>
             <FileInput
               name="resume"
               label="Resume"
@@ -290,12 +159,6 @@ export default function EnterpriseAtsStyle() {
               onChange={(next) =>
                 setFiles((prev) => [...prev.filter((f) => f.field !== 'resume'), ...next])
               }
-            />
-            <TextareaField
-              name="additionalNotes"
-              label="Anything else?"
-              value={fields.additionalNotes}
-              onChange={(v) => setField('additionalNotes', v)}
             />
           </fieldset>
         )}

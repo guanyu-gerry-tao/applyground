@@ -5,16 +5,16 @@ import {
   RadioGroup,
   SelectField,
   TextareaField,
-} from '../../components/Field';
-import FileInput from '../../components/FileInput';
-import ScenarioFrame from '../../components/ScenarioFrame';
-import ValidationSummary from '../../components/ValidationSummary';
-import { findScenarioMeta } from '../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../lib/submission';
+} from '../../../components/Field';
+import FileInput from '../../../components/FileInput';
+import ScenarioFrame from '../../../components/ScenarioFrame';
+import ValidationSummary from '../../../components/ValidationSummary';
+import { findScenarioMeta } from '../../../data/scenarios';
+import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
-} from '../../types/scenario';
+} from '../../../types/scenario';
 
 const SCENARIO_ID = 'company-screening-form' as const;
 

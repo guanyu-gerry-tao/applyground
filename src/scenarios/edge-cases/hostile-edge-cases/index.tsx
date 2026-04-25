@@ -1,19 +1,19 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Field } from '../../components/Field';
-import AmbiguousLabelGroup from '../../components/AmbiguousLabelGroup';
-import DelayedSection from '../../components/DelayedSection';
-import IframeUploadRegion from '../../components/IframeUploadRegion';
-import ScenarioFrame from '../../components/ScenarioFrame';
-import ShadowField from '../../components/ShadowField';
-import ValidationSummary from '../../components/ValidationSummary';
-import WeirdSelect from '../../components/WeirdSelect';
-import { findScenarioMeta } from '../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../lib/submission';
+import { Field } from '../../../components/Field';
+import AmbiguousLabelGroup from '../../../components/AmbiguousLabelGroup';
+import DelayedSection from '../../../components/DelayedSection';
+import IframeUploadRegion from '../../../components/IframeUploadRegion';
+import ScenarioFrame from '../../../components/ScenarioFrame';
+import ShadowField from '../../../components/ShadowField';
+import ValidationSummary from '../../../components/ValidationSummary';
+import WeirdSelect from '../../../components/WeirdSelect';
+import { findScenarioMeta } from '../../../data/scenarios';
+import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
-} from '../../types/scenario';
+} from '../../../types/scenario';
 
 const SCENARIO_ID = 'hostile-edge-cases' as const;
 

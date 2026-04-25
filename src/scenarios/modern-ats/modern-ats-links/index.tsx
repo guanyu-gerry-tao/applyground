@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Field, TextareaField } from '../../components/Field';
-import FileInput from '../../components/FileInput';
-import ScenarioFrame from '../../components/ScenarioFrame';
-import ValidationSummary from '../../components/ValidationSummary';
-import { findScenarioMeta } from '../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../lib/submission';
+import { Field, TextareaField } from '../../../components/Field';
+import FileInput from '../../../components/FileInput';
+import ScenarioFrame from '../../../components/ScenarioFrame';
+import ValidationSummary from '../../../components/ValidationSummary';
+import { findScenarioMeta } from '../../../data/scenarios';
+import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
-} from '../../types/scenario';
+} from '../../../types/scenario';
 
 const SCENARIO_ID = 'modern-ats-links' as const;
 
