@@ -8,6 +8,8 @@ import EnterpriseAtsStyle from './workday-style/EnterpriseAtsStyle';
 import EnterpriseAtsShort from './workday-style/EnterpriseAtsShort';
 import ModernAtsStyle from './modern-ats/ModernAtsStyle';
 import ModernAtsLinks from './modern-ats/ModernAtsLinks';
+import HostileEdgeCases from './edge-cases/HostileEdgeCases';
+import MildEdgeCases from './edge-cases/MildEdgeCases';
 
 export type ScenarioComponent = ComponentType;
 
@@ -20,4 +22,6 @@ export const SCENARIO_COMPONENTS: Partial<Record<ScenarioId, ScenarioComponent>>
   'enterprise-ats-short': EnterpriseAtsShort,
   'modern-ats-style': ModernAtsStyle,
   'modern-ats-links': ModernAtsLinks,
+  'hostile-edge-cases': HostileEdgeCases,
+  'mild-edge-cases': MildEdgeCases,
 };
