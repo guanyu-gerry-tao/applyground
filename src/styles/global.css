@@ -656,7 +656,8 @@ button:hover {
 button[type='submit'],
 button[data-action='submit-application'],
 button[data-action='step-next'],
-button[data-action='open-apply'] {
+button[data-action='open-apply'],
+button[data-action='start-application'] {
   background: var(--accent);
   color: white;
   border-color: var(--accent);
@@ -665,10 +666,20 @@ button[data-action='open-apply'] {
 button[type='submit']:hover,
 button[data-action='submit-application']:hover,
 button[data-action='step-next']:hover,
-button[data-action='open-apply']:hover {
+button[data-action='open-apply']:hover,
+button[data-action='start-application']:hover {
   background: #006fe6;
   border-color: #006fe6;
   color: white;
+}
+
+button[data-action='start-application'] {
+  font-size: 1rem;
+  padding: 0.6rem 1.4rem;
+}
+
+[data-stage='jd'] {
+  margin: var(--gap-md) 0 0;
 }
 
 button:disabled,

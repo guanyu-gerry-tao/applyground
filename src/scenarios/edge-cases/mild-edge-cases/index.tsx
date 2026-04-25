@@ -36,6 +36,7 @@ export default function MildEdgeCases() {
   });
   const [files, setFiles] = useState<SubmissionFileMetadata[]>([]);
   const [validation, setValidation] = useState<SubmissionValidationResult | null>(null);
+  const [started, setStarted] = useState(false);
 
   const setField = (k: string, v: string) =>
     setFields((prev) => ({ ...prev, [k]: v }));
@@ -56,7 +57,18 @@ export default function MildEdgeCases() {
         and a documented honeypot. No shadow DOM and no iframe-style region — see
         <code>hostile-edge-cases</code> for those.
       </p>
-      <form onSubmit={handleSubmit} noValidate>
+      {!started ? (
+        <p data-stage="jd">
+          <button
+            type="button"
+            data-action="start-application"
+            onClick={() => setStarted(true)}
+          >
+            Start application →
+          </button>
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} noValidate>
         <AmbiguousLabelGroup
           fullName={fields.fullName}
           email={fields.email}
@@ -112,6 +124,7 @@ export default function MildEdgeCases() {
           Submit application
         </button>
       </form>
+      )}
     </ScenarioFrame>
   );
 }

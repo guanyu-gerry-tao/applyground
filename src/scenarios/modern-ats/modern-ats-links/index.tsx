@@ -30,6 +30,7 @@ export default function ModernAtsLinks() {
   });
   const [files, setFiles] = useState<SubmissionFileMetadata[]>([]);
   const [validation, setValidation] = useState<SubmissionValidationResult | null>(null);
+  const [started, setStarted] = useState(false);
 
   const setField = (k: string, v: string) =>
     setFields((prev) => ({ ...prev, [k]: v }));
@@ -45,7 +46,18 @@ export default function ModernAtsLinks() {
 
   return (
     <ScenarioFrame meta={meta}>
-      <form onSubmit={handleSubmit} noValidate>
+      {!started ? (
+        <p data-stage="jd">
+          <button
+            type="button"
+            data-action="start-application"
+            onClick={() => setStarted(true)}
+          >
+            Start application →
+          </button>
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} noValidate>
         <h3>Contact</h3>
         <Field
           name="fullName"
@@ -132,6 +144,7 @@ export default function ModernAtsLinks() {
           Submit application
         </button>
       </form>
+      )}
     </ScenarioFrame>
   );
 }

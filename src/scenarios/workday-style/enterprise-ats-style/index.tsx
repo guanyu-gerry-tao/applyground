@@ -77,6 +77,7 @@ export default function EnterpriseAtsStyle() {
   });
   const [files, setFiles] = useState<SubmissionFileMetadata[]>([]);
   const [validation, setValidation] = useState<SubmissionValidationResult | null>(null);
+  const [started, setStarted] = useState(false);
 
   const setField = (k: string, v: string) =>
     setFields((prev) => ({ ...prev, [k]: v }));
@@ -122,7 +123,19 @@ export default function EnterpriseAtsStyle() {
 
   return (
     <ScenarioFrame meta={meta}>
-      <WizardSteps steps={STEPS} currentIndex={step} />
+      {!started ? (
+        <p data-stage="jd">
+          <button
+            type="button"
+            data-action="start-application"
+            onClick={() => setStarted(true)}
+          >
+            Start application →
+          </button>
+        </p>
+      ) : (
+        <>
+          <WizardSteps steps={STEPS} currentIndex={step} />
       <form onSubmit={handleSubmit} noValidate>
         {step === 0 && (
           <fieldset data-step="personal">
@@ -331,6 +344,8 @@ export default function EnterpriseAtsStyle() {
           )}
         </div>
       </form>
+        </>
+      )}
     </ScenarioFrame>
   );
 }

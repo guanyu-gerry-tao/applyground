@@ -38,6 +38,7 @@ export default function HostileEdgeCases() {
   });
   const [files, setFiles] = useState<SubmissionFileMetadata[]>([]);
   const [validation, setValidation] = useState<SubmissionValidationResult | null>(null);
+  const [started, setStarted] = useState(false);
 
   const setField = (k: string, v: string) =>
     setFields((prev) => ({ ...prev, [k]: v }));
@@ -57,7 +58,18 @@ export default function HostileEdgeCases() {
         Documented hostile fixtures: ambiguous labels, custom dropdown, shadow DOM, delayed
         section, iframe-style upload, and a honeypot. Each one is described in-page.
       </p>
-      <form onSubmit={handleSubmit} noValidate>
+      {!started ? (
+        <p data-stage="jd">
+          <button
+            type="button"
+            data-action="start-application"
+            onClick={() => setStarted(true)}
+          >
+            Start application →
+          </button>
+        </p>
+      ) : (
+        <form onSubmit={handleSubmit} noValidate>
         <AmbiguousLabelGroup
           fullName={fields.fullName}
           email={fields.email}
@@ -123,6 +135,7 @@ export default function HostileEdgeCases() {
           Submit application
         </button>
       </form>
+      )}
     </ScenarioFrame>
   );
 }
