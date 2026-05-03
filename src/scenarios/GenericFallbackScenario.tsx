@@ -5,7 +5,7 @@ import { Field, TextareaField } from '../components/Field';
 import FileInput from '../components/FileInput';
 import ScenarioFrame from '../components/ScenarioFrame';
 import ValidationSummary from '../components/ValidationSummary';
-import { buildSubmission, saveLatestToSession } from '../lib/submission';
+import { buildScoreUrl, buildSubmission, saveLatestToSession } from '../lib/submission';
 import type { SubmissionValidationResult } from '../types/scenario';
 
 interface GenericFallbackScenarioProps {
@@ -28,7 +28,7 @@ export default function GenericFallbackScenario({ meta }: GenericFallbackScenari
     setValidation(submission.validation);
     if (!submission.validation.passed) return;
     saveLatestToSession(submission);
-    navigate(`/confirmation/${meta.id}`);
+    navigate(buildScoreUrl(meta.id, submission));
   };
 
   return (

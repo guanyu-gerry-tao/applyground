@@ -1,0 +1,9 @@
+[
+  {
+    "label": "big_company_cs_1000",
+    "url": "/data/big_company_cs_1000.jsonl",
+    "description": "Neutralized computer-science job descriptions for application automation testing.",
+    "format": "jsonl",
+    "count": 1000
+  }
+]

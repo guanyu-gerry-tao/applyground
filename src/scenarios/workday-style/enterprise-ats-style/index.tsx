@@ -11,7 +11,7 @@ import ScenarioFrame from '../../../components/ScenarioFrame';
 import ValidationSummary from '../../../components/ValidationSummary';
 import WizardSteps from '../../../components/WizardSteps';
 import { findScenarioMeta } from '../../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
+import { buildScoreUrl, buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
@@ -118,7 +118,7 @@ export default function EnterpriseAtsStyle() {
     setValidation(submission.validation);
     if (!submission.validation.passed) return;
     saveLatestToSession(submission);
-    navigate(`/confirmation/${SCENARIO_ID}`);
+    navigate(buildScoreUrl(SCENARIO_ID, submission));
   };
 
   return (
