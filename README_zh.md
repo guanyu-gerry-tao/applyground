@@ -2,6 +2,10 @@
 
 > 一个 AI 自动化求职申请表单测试网站。
 
+> **在线 Demo：** [https://applyground.vercel.app/](https://applyground.vercel.app/)  
+> 欢迎带上你的 AI browser agent、Playwright bot、Selenium 脚本或自动化 workflow，
+> 测试它如何处理真实感求职申请表单。
+
 一个 MIT 开源、纯静态的 web playground，用来测试求职申请表单自动化。
 所有页面都是中性、原创的 fixtures：不复刻真实品牌视觉、不复制真实 DOM、
 不接后端、不持久化提交。

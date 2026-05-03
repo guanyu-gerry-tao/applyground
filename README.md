@@ -2,6 +2,10 @@
 
 > An AI automation test site for job application forms.
 
+> **Live Demo:** [https://applyground.vercel.app/](https://applyground.vercel.app/)  
+> Bring your AI browser agent, Playwright bot, Selenium script, or workflow
+> automation tool and test how it handles realistic job application forms.
+
 A static, MIT-licensed playground for testing job-application form automation.
 The pages are neutral, original fixtures: no real brand visuals, no copied DOM,
 no backend, and no persisted submissions.
