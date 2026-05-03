@@ -24,6 +24,32 @@ function parseScoreSearch(search: string): Record<string, string> {
   return values;
 }
 
+function parseNonNegativeSeconds(value: string): number {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) return 0;
+  return parsed;
+}
+
+function formatElapsedSeconds(value: string): string {
+  const seconds = parseNonNegativeSeconds(value);
+  if (seconds < 60) return `${seconds}s`;
+
+  const minutes = Math.floor(seconds / 60);
+  const remainder = seconds % 60;
+  if (minutes < 60) return remainder ? `${minutes}m ${remainder}s` : `${minutes}m`;
+
+  const hours = Math.floor(minutes / 60);
+  const minuteRemainder = minutes % 60;
+  return minuteRemainder ? `${hours}h ${minuteRemainder}m` : `${hours}h`;
+}
+
+function openJsonEcho(data: unknown): void {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  window.location.assign(url);
+}
+
 export default function ScorePage() {
   const { scenarioId } = useParams();
   const meta = scenarioId ? findScenarioMeta(scenarioId as ScenarioId) : undefined;
@@ -45,26 +71,61 @@ export default function ScorePage() {
   const dataset = scoreParams.dataset;
   const seconds = scoreParams.sec ?? '0';
   const filled = scoreParams.filled ?? '0%';
+  const elapsedLabel = formatElapsedSeconds(seconds);
+  const rawSeconds = String(parseNonNegativeSeconds(seconds));
+  const validationLabel = submission
+    ? (submission.validation.passed ? 'Passed' : 'Failed')
+    : 'No local submission';
+  const scoreState = submission
+    ? (submission.validation.passed ? 'passed' : 'failed')
+    : 'unknown';
+  const scoreLabel = submission
+    ? `${submission.score.points} / ${submission.score.maxPoints}`
+    : 'Not available';
   const jdSearch = new URLSearchParams({ scenarios: meta.id, id: jdId });
   if (dataset) jdSearch.set('dataset', dataset);
 
   return (
     <section data-page="score" data-scenario-id={meta.id} data-jd-id={jdId}>
-      <p data-breadcrumb="">
-        <Link to="/">Home</Link> /{' '}
-        <Link to={`/jd?${jdSearch.toString()}`}>{meta.id}</Link> /{' '}
-        <span>score</span>
-      </p>
-
       <h1>Application score</h1>
-      <p>
+      <p data-score-intro="">
         This page reports the local result calculated after submit. Nothing was sent over the
         network.
       </p>
 
       <section data-section="score-summary">
-        <h2>Run summary</h2>
-        <dl>
+        <div data-score-summary-header="">
+          <div>
+            <p data-score-kicker="">Run summary</p>
+            <h2>Local result</h2>
+          </div>
+          <span
+            data-score-status=""
+            data-state={scoreState}
+          >
+            {validationLabel}
+          </span>
+        </div>
+
+        <dl data-score-metrics="">
+          <div data-score-metric="time">
+            <dt>Application time</dt>
+            <dd data-score-value={rawSeconds}>{elapsedLabel}</dd>
+            <p>Started when this JD opened.</p>
+          </div>
+          <div data-score-metric="filled">
+            <dt>Filled</dt>
+            <dd>{filled}</dd>
+            <p>Estimated from the local rubric.</p>
+          </div>
+          <div data-score-metric="rubric">
+            <dt>Rubric score</dt>
+            <dd>{scoreLabel}</dd>
+            <p>Computed in this browser only.</p>
+          </div>
+        </dl>
+
+        <dl data-score-details="">
           <dt>Scenario</dt>
           <dd>{meta.id}</dd>
           <dt>JD id</dt>
@@ -75,17 +136,8 @@ export default function ScorePage() {
               <dd>{dataset}</dd>
             </>
           )}
-          <dt>Elapsed seconds</dt>
-          <dd>{seconds}</dd>
-          <dt>Filled</dt>
-          <dd>{filled}</dd>
           {submission && (
             <>
-              <dt>Rubric score</dt>
-              <dd>
-                {submission.score.points} / {submission.score.maxPoints}
-                {submission.score.passed ? ' (passed)' : ''}
-              </dd>
               <dt>Validation</dt>
               <dd>
                 {submission.validation.passed ? 'passed' : 'failed'}
@@ -98,12 +150,21 @@ export default function ScorePage() {
         </dl>
       </section>
 
-      <p>
-        <Link to={`/jd?${jdSearch.toString()}`}>
+      <nav data-score-actions="" aria-label="Score actions">
+        <Link to={`/jd?${jdSearch.toString()}`} data-score-action="primary">
           Return to this JD
-        </Link>{' '}
-        · <Link to={`/confirmation/${meta.id}`}>View JSON echo</Link>
-      </p>
+        </Link>
+        <button
+          type="button"
+          data-score-action="secondary"
+          disabled={!submission}
+          onClick={() => {
+            if (submission) openJsonEcho(submission);
+          }}
+        >
+          View JSON echo
+        </button>
+      </nav>
     </section>
   );
 }

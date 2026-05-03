@@ -4,6 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import type { ScenarioId, ScenarioMeta } from '../types/scenario';
 import { SCENARIO_META } from '../data/scenarios';
 import { findJdByScenario } from '../data/jds';
+import { startJdRunTimer } from '../lib/submission';
 import {
   excerptFromJobHtml,
   findJsonlJobById,
@@ -101,6 +102,13 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
   useEffect(() => {
     setIsMoreRevealed(false);
   }, [requestedDataset, requestedJdId, moreStyleEnabled]);
+
+  useEffect(() => {
+    startJdRunTimer({
+      dataset: requestedDataset,
+      jdId: requestedJdId ?? '0',
+    });
+  }, [requestedDataset, requestedJdId]);
 
   const canRenderJsonlHtml = Boolean(jsonlJob && (!moreStyleEnabled || isMoreRevealed));
   const sanitizedJsonlHtml = canRenderJsonlHtml && jsonlJob?.html
@@ -220,101 +228,103 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
       data-platform-style={platformStyleEnabled ? 'true' : 'false'}
       data-more-style={moreStyleEnabled ? 'true' : 'false'}
     >
-      <details
-        data-section="styles"
-        onToggle={(event) => setIsStylesOpen(event.currentTarget.open)}
-      >
-        <summary>Styles</summary>
-        {isStylesOpen && (
-          <>
-            <section data-section="style-controls">
-              <h2>Page style</h2>
-              <div data-style-control-row="">
-                <span>Platform style</span>
-                <span data-style-toggle-group="" role="group" aria-label="Platform style">
-                  <button
-                    type="button"
-                    data-style-toggle=""
-                    data-selected={platformStyleEnabled ? 'false' : 'true'}
-                    onClick={() => setStyleParam('platform-style', false)}
-                  >
-                    No
-                  </button>
-                  <button
-                    type="button"
-                    data-style-toggle=""
-                    data-selected={platformStyleEnabled ? 'true' : 'false'}
-                    onClick={() => setStyleParam('platform-style', true)}
-                  >
-                    Yes
-                  </button>
-                </span>
-              </div>
-              <div data-style-control-row="">
-                <span>More wall</span>
-                <span data-style-toggle-group="" role="group" aria-label="More wall">
-                  <button
-                    type="button"
-                    data-style-toggle=""
-                    data-selected={moreStyleEnabled ? 'false' : 'true'}
-                    onClick={() => setStyleParam('more-style', false)}
-                  >
-                    No
-                  </button>
-                  <button
-                    type="button"
-                    data-style-toggle=""
-                    data-selected={moreStyleEnabled ? 'true' : 'false'}
-                    onClick={() => setStyleParam('more-style', true)}
-                  >
-                    Yes
-                  </button>
-                </span>
-              </div>
-            </section>
-
-            <section data-section="scenario-info">
-              <div data-scenario-selector-header="">
-                <h2>Application form</h2>
-                <p>Choose a form level for this JD.</p>
-              </div>
-              <ul data-scenario-selector="">
-                {scenarioOptions.map((scenario) => (
-                  <li key={scenario.id}>
+      <div data-jd-controls="">
+        <details
+          data-section="styles"
+          onToggle={(event) => setIsStylesOpen(event.currentTarget.open)}
+        >
+          <summary>Styles</summary>
+          {isStylesOpen && (
+            <>
+              <section data-section="style-controls">
+                <h2>Page style</h2>
+                <div data-style-control-row="">
+                  <span>Platform style</span>
+                  <span data-style-toggle-group="" role="group" aria-label="Platform style">
                     <button
                       type="button"
-                      data-scenario-option=""
-                      data-selected={scenario.id === meta.id ? 'true' : 'false'}
-                      onClick={() => switchScenario(scenario.id)}
+                      data-style-toggle=""
+                      data-selected={platformStyleEnabled ? 'false' : 'true'}
+                      onClick={() => setStyleParam('platform-style', false)}
                     >
-                      <span data-scenario-level>Level {scenario.level}</span>
-                      <span data-scenario-option-main="">
-                        <span data-scenario-option-title="">{scenario.title}</span>
-                        <code>{scenario.id}</code>
-                      </span>
+                      No
                     </button>
-                  </li>
-                ))}
-              </ul>
-            </section>
+                    <button
+                      type="button"
+                      data-style-toggle=""
+                      data-selected={platformStyleEnabled ? 'true' : 'false'}
+                      onClick={() => setStyleParam('platform-style', true)}
+                    >
+                      Yes
+                    </button>
+                  </span>
+                </div>
+                <div data-style-control-row="">
+                  <span>More wall</span>
+                  <span data-style-toggle-group="" role="group" aria-label="More wall">
+                    <button
+                      type="button"
+                      data-style-toggle=""
+                      data-selected={moreStyleEnabled ? 'false' : 'true'}
+                      onClick={() => setStyleParam('more-style', false)}
+                    >
+                      No
+                    </button>
+                    <button
+                      type="button"
+                      data-style-toggle=""
+                      data-selected={moreStyleEnabled ? 'true' : 'false'}
+                      onClick={() => setStyleParam('more-style', true)}
+                    >
+                      Yes
+                    </button>
+                  </span>
+                </div>
+              </section>
 
-            <section data-section="expected-fields">
-              <h2>Expected fields (for automation operators)</h2>
-              <ul>
-                {meta.expectedFields.map((f) => (
-                  <li key={f.name}>
-                    <code>{f.name}</code> - {f.label}
-                    {f.required ? ' (required)' : ''}
-                    {f.notes ? `. ${f.notes}` : ''}
-                  </li>
-                ))}
-              </ul>
-            </section>
-          </>
-        )}
-      </details>
+              <section data-section="scenario-info">
+                <div data-scenario-selector-header="">
+                  <h2>Application form</h2>
+                  <p>Choose a form level for this JD.</p>
+                </div>
+                <ul data-scenario-selector="">
+                  {scenarioOptions.map((scenario) => (
+                    <li key={scenario.id}>
+                      <button
+                        type="button"
+                        data-scenario-option=""
+                        data-selected={scenario.id === meta.id ? 'true' : 'false'}
+                        onClick={() => switchScenario(scenario.id)}
+                      >
+                        <span data-scenario-level>Level {scenario.level}</span>
+                        <span data-scenario-option-main="">
+                          <span data-scenario-option-title="">{scenario.title}</span>
+                          <code>{scenario.id}</code>
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </section>
 
-      {renderJobPager('top')}
+              <section data-section="expected-fields">
+                <h2>Expected fields (for automation operators)</h2>
+                <ul>
+                  {meta.expectedFields.map((f) => (
+                    <li key={f.name}>
+                      <code>{f.name}</code> - {f.label}
+                      {f.required ? ' (required)' : ''}
+                      {f.notes ? `. ${f.notes}` : ''}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            </>
+          )}
+        </details>
+
+        {renderJobPager('top')}
+      </div>
 
       {isJsonlLoading ? (
         <section data-section="jd" data-jd-source="jsonl" data-state="loading">
