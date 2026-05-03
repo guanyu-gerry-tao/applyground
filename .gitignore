@@ -148,6 +148,8 @@ tmp/
 # Data processing workspace
 data-processing/raw/**
 !data-processing/raw/.gitkeep
+data-processing/output/**
+!data-processing/output/.gitkeep
 
 # Superpowers skill artifacts (working files only).
 # The original design specs under docs/superpowers/specs/ stay tracked;
