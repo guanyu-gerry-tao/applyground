@@ -38,11 +38,6 @@ export default function ConfirmationPage() {
 
   return (
     <section data-page="confirmation" data-state="filled" data-scenario-id={meta.id}>
-      <p>
-        <Link to="/">Home</Link> / <Link to={`/types/${meta.typeId}`}>{meta.typeId}</Link> /{' '}
-        <Link to={`/scenarios/${meta.id}`}>{meta.id}</Link> / <span>confirmation</span>
-      </p>
-
       <h1>Submission received: {meta.title}</h1>
       <p>
         This page echoes the submission for automation operators. Nothing was sent over the

@@ -28,9 +28,9 @@ function JobRow({ job, index, datasetLabel }: JobRowProps) {
   return (
     <li data-job-row="" data-job-id={jobRouteId} data-level={job.job_level}>
       <Link to={`/jd?${jobSearch.toString()}`} data-job-row-link="">
-        <span data-job-index="">{index}</span>
         <div>
           <div data-job-title-row="">
+            <span data-job-index="">{index}.</span>
             <span data-job-title="">{job.title}</span>
             <p data-job-meta="">
               <span>{job.job_level || 'unknown level'}</span>
@@ -125,21 +125,34 @@ export default function Home() {
   };
 
   const datasetLabel = activeDataset?.label ?? selectedDataset;
+  const visibleStart = filteredJobs.length ? (safePage - 1) * PAGE_SIZE + 1 : 0;
+  const visibleEnd = Math.min(safePage * PAGE_SIZE, filteredJobs.length);
+  const indexStatus = jobs.length === 0
+    ? 'Loading dataset'
+    : `${visibleStart}-${visibleEnd} of ${filteredJobs.length}${
+      filteredJobs.length !== jobs.length ? ` filtered from ${jobs.length}` : ''
+    }`;
 
   return (
     <section data-page="home">
-      <section data-section="job-index-controls">
-        <div>
-          <h2>{datasetLabel || 'Datasets'} jobs</h2>
+      <section data-section="home-overview">
+        <div data-home-intro="">
+          <h1>Job Application Test Fixtures</h1>
           <p>
-            {activeDataset?.description ?? 'Neutral job descriptions for testing application automation.'}
-            {' '}Showing{' '}
-            {filteredJobs.length ? (safePage - 1) * PAGE_SIZE + 1 : 0}-
-            {Math.min(safePage * PAGE_SIZE, filteredJobs.length)} of {filteredJobs.length}
-            {filteredJobs.length !== jobs.length ? ` filtered from ${jobs.length}` : ''}.
+            Neutral fake jobs and application forms for testing whether your AI agent can read,
+            navigate, and submit local-only JSON results.
           </p>
         </div>
-        <div data-job-filters="">
+      </section>
+
+      <section data-section="job-index-controls" aria-label="Job index controls">
+        <div data-job-index-status="">
+          <span data-toolbar-label="">Index</span>
+          <span data-toolbar-value="">
+            <code>{datasetLabel || 'loading'}</code> · {indexStatus} · Static-only JSON echo
+          </span>
+        </div>
+        <div data-job-filters="" aria-label="Job index filters">
           <label>
             <span>Level</span>
             <select

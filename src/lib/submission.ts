@@ -10,12 +10,23 @@ import { isFileField, validateRequired } from './validation';
 
 export const APP_VERSION = '0.1.0';
 export const SUBMISSION_STORAGE_KEY = 'applyground.latestSubmission';
+const JD_RUN_TIMER_STORAGE_KEY = 'applyground.currentJdRunTimer';
 
 export interface BuildSubmissionInput {
   scenarioMeta: ScenarioMeta;
   fields: Record<string, string>;
   files: SubmissionFileMetadata[];
   rawFields?: Record<string, unknown>;
+}
+
+interface JdRunTimerInput {
+  dataset?: string | null;
+  jdId?: string | null;
+}
+
+interface StoredJdRunTimer {
+  key: string;
+  startedAtMs: number;
 }
 
 const KNOWN_CANDIDATE_KEYS = new Set([
@@ -168,11 +179,51 @@ export function saveLatestToSession(submission: Submission): void {
   }
 }
 
+function buildJdRunTimerKey(input: JdRunTimerInput): string {
+  return [
+    input.dataset?.trim() || 'default-dataset',
+    input.jdId?.trim() || '0',
+  ].join(':');
+}
+
+export function startJdRunTimer(input: JdRunTimerInput): void {
+  const timer: StoredJdRunTimer = {
+    key: buildJdRunTimerKey(input),
+    startedAtMs: performance.now(),
+  };
+
+  try {
+    sessionStorage.setItem(JD_RUN_TIMER_STORAGE_KEY, JSON.stringify(timer));
+  } catch (err) {
+    console.warn('Failed to write JD run timer to sessionStorage', err);
+  }
+}
+
+function getJdRunElapsedSeconds(input: JdRunTimerInput): number {
+  try {
+    const raw = sessionStorage.getItem(JD_RUN_TIMER_STORAGE_KEY);
+    if (!raw) return 0;
+
+    const timer = JSON.parse(raw) as Partial<StoredJdRunTimer>;
+    if (
+      timer.key !== buildJdRunTimerKey(input) ||
+      typeof timer.startedAtMs !== 'number' ||
+      !Number.isFinite(timer.startedAtMs)
+    ) {
+      return 0;
+    }
+
+    return Math.max(0, Math.round((performance.now() - timer.startedAtMs) / 1000));
+  } catch {
+    return 0;
+  }
+}
+
 export function buildScoreUrl(scenarioId: ScenarioId, submission: Submission): string {
   const search = new URLSearchParams(window.location.search);
   const jdId = search.get('id') ?? '0';
   const dataset = search.get('dataset');
-  const seconds = Math.max(0, Math.round(performance.now() / 1000));
+  const seconds = getJdRunElapsedSeconds({ dataset, jdId });
   const filledPercent = submission.score.maxPoints > 0
     ? Math.round((submission.score.points / submission.score.maxPoints) * 100)
     : 0;

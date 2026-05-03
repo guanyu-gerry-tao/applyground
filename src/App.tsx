@@ -9,7 +9,6 @@ export default function App() {
         <div data-app-header-row>
           <p data-app-brand>
             <Link to="/">Applyground</Link>
-            <span data-app-tagline> — neutral fixtures for job-application form automation.</span>
           </p>
           <a
             data-app-star-link

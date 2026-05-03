@@ -133,6 +133,49 @@ function sanitizeJobDocument(doc: Document): void {
       }
     }
   });
+
+  const rawUrlPattern = /https?:\/\/[^\s,<)]+/gi;
+  const getUrlLabel = (url: string) => (
+    url.includes('careers.example.test') ? 'job post link' : 'external link'
+  );
+
+  doc.body.querySelectorAll('span').forEach((span) => {
+    const text = span.textContent ?? '';
+    if (!rawUrlPattern.test(text)) return;
+
+    rawUrlPattern.lastIndex = 0;
+    span.removeAttribute('style');
+  });
+
+  doc.body.querySelectorAll('a').forEach((link) => {
+    const href = link.getAttribute('href')?.trim() ?? '';
+    const text = (link.textContent ?? '').trim();
+    const looksLikeRawUrl = /^https?:\/\/\S+/i.test(text);
+    if (!looksLikeRawUrl) return;
+
+    link.setAttribute('data-raw-url-link', 'true');
+    link.setAttribute('title', href);
+    link.textContent = getUrlLabel(href || text);
+  });
+
+  const walker = doc.createTreeWalker(doc.body, NodeFilter.SHOW_TEXT);
+  const textNodes: Text[] = [];
+  let current = walker.nextNode();
+  while (current) {
+    textNodes.push(current as Text);
+    current = walker.nextNode();
+  }
+
+  textNodes.forEach((textNode) => {
+    const parent = textNode.parentElement;
+    if (parent?.closest('a')) return;
+
+    const value = textNode.nodeValue ?? '';
+    if (!rawUrlPattern.test(value)) return;
+
+    rawUrlPattern.lastIndex = 0;
+    textNode.nodeValue = value.replace(rawUrlPattern, getUrlLabel);
+  });
 }
 
 export function sanitizeJobHtml(html: string): string {
