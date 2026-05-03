@@ -142,6 +142,12 @@ export default function Home() {
             Static job posts and form scenarios for checking how AI agents read, navigate,
             and return local-only JSON results.
           </p>
+          <p data-home-privacy-note="">
+            Applyground is fully frontend-only: there is no backend logging, privacy tracking, or
+            server-side persistence. Job descriptions come from open-source web resources on
+            Hugging Face and have been de-identified before inclusion. Still, do not use real
+            personal information when testing.
+          </p>
         </div>
       </section>
 
