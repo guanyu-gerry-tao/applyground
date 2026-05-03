@@ -774,14 +774,13 @@ code {
 }
 
 [data-styles-hint] {
-  display: inline-flex;
-  align-items: center;
-  margin-left: 0.45rem;
+  position: absolute;
+  top: 0.48rem;
+  left: 4.6rem;
   color: var(--label-tertiary);
   font-size: 0.78rem;
   font-weight: 560;
   line-height: 1.2;
-  vertical-align: middle;
 }
 
 [data-section='styles'] > summary {
@@ -1872,9 +1871,9 @@ input[type='file']::file-selector-button:hover {
   }
 
   [data-styles-hint] {
-    margin-left: 0.15rem;
+    top: 0.48rem;
+    left: 4.6rem;
     max-width: calc(100% - 5.8rem);
-    flex-wrap: wrap;
   }
 
   [data-jd-controls] [data-job-pager='top'] {
