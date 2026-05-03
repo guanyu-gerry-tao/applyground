@@ -229,18 +229,30 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
       data-more-style={moreStyleEnabled ? 'true' : 'false'}
     >
       <div data-jd-controls="">
-        <details
+        <section
           data-section="styles"
-          onToggle={(event) => setIsStylesOpen(event.currentTarget.open)}
+          data-open={isStylesOpen ? 'true' : 'false'}
         >
-          <summary>Styles</summary>
+          <div data-styles-header="">
+            <button
+              type="button"
+              data-styles-summary=""
+              aria-expanded={isStylesOpen}
+              onClick={() => setIsStylesOpen((open) => !open)}
+            >
+              Options
+            </button>
+            <span data-styles-hint="">
+              ← Form type and page conditions
+            </span>
+          </div>
           {isStylesOpen && (
             <>
               <section data-section="style-controls">
-                <h2>Page style</h2>
+                <h2>Page conditions</h2>
                 <div data-style-control-row="">
-                  <span>Platform style</span>
-                  <span data-style-toggle-group="" role="group" aria-label="Platform style">
+                  <span data-style-label="">Platform layout</span>
+                  <span data-style-toggle-group="" role="group" aria-label="Platform layout">
                     <button
                       type="button"
                       data-style-toggle=""
@@ -260,8 +272,8 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
                   </span>
                 </div>
                 <div data-style-control-row="">
-                  <span>More wall</span>
-                  <span data-style-toggle-group="" role="group" aria-label="More wall">
+                  <span data-style-label="">More button</span>
+                  <span data-style-toggle-group="" role="group" aria-label="More button">
                     <button
                       type="button"
                       data-style-toggle=""
@@ -284,8 +296,8 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
 
               <section data-section="scenario-info">
                 <div data-scenario-selector-header="">
-                  <h2>Application form</h2>
-                  <p>Choose a form level for this JD.</p>
+                  <h2>Form type</h2>
+                  <p>Choose the application flow for this JD.</p>
                 </div>
                 <ul data-scenario-selector="">
                   {scenarioOptions.map((scenario) => (
@@ -299,7 +311,6 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
                         <span data-scenario-level>Level {scenario.level}</span>
                         <span data-scenario-option-main="">
                           <span data-scenario-option-title="">{scenario.title}</span>
-                          <code>{scenario.id}</code>
                         </span>
                       </button>
                     </li>
@@ -321,10 +332,7 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
               </section>
             </>
           )}
-        </details>
-        <span data-styles-hint="">
-          ← Change form types, simulate platform conditions
-        </span>
+        </section>
 
         {renderJobPager('top')}
       </div>
