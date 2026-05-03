@@ -2,7 +2,8 @@
 
 > 一个 AI 自动化求职申请表单测试网站。
 
-> **在线 Demo：** [https://applyground.vercel.app/](https://applyground.vercel.app/)  
+> **在线 Demo：** [https://www.applyground.work/](https://www.applyground.work/)
+> **旧 Demo：** [https://applyground.vercel.app/](https://applyground.vercel.app/)
 > 欢迎带上你的 AI browser agent、Playwright bot、Selenium 脚本或自动化 workflow，
 > 测试它如何处理真实感求职申请表单。
 
@@ -174,6 +175,13 @@ OpenAI 参考文档：
 - [Batch API guide](https://platform.openai.com/docs/guides/batch)
 - [Batch API reference](https://platform.openai.com/docs/api-reference/batch)
 - [`gpt-4.1-mini` model reference](https://platform.openai.com/docs/models/gpt-4.1-mini)
+
+## 特别感谢
+
+特别感谢 Hugging Face 上的
+[`edwarddgao/open-apply-jobs`](https://huggingface.co/datasets/edwarddgao/open-apply-jobs)。
+Applyground 第一批 1,000 条 JD fixtures 来自这个开源数据集，并在入库前完成脱敏和
+中性化处理。
 
 ## 部署
 

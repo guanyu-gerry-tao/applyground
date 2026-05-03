@@ -2,7 +2,8 @@
 
 > An AI automation test site for job application forms.
 
-> **Live Demo:** [https://applyground.vercel.app/](https://applyground.vercel.app/)  
+> **Live Demo:** [https://www.applyground.work/](https://www.applyground.work/)
+> **Legacy Demo:** [https://applyground.vercel.app/](https://applyground.vercel.app/)
 > Bring your AI browser agent, Playwright bot, Selenium script, or workflow
 > automation tool and test how it handles realistic job application forms.
 
@@ -183,6 +184,13 @@ OpenAI references:
 - [Batch API guide](https://platform.openai.com/docs/guides/batch)
 - [Batch API reference](https://platform.openai.com/docs/api-reference/batch)
 - [`gpt-4.1-mini` model reference](https://platform.openai.com/docs/models/gpt-4.1-mini)
+
+## Acknowledgements
+
+Special thanks to
+[`edwarddgao/open-apply-jobs`](https://huggingface.co/datasets/edwarddgao/open-apply-jobs)
+on Hugging Face. Applyground's first 1,000 JD fixtures were sampled from this
+open dataset before de-identification and neutralization.
 
 ## Deploy
 
