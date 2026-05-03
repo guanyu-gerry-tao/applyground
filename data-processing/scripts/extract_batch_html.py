@@ -63,24 +63,42 @@ def load_all_output_rows(paths: list[Path]) -> list[dict[str, Any]]:
     return rows
 
 
-def row_html(item: dict[str, Any]) -> str:
-    """Return HTML from an extracted row or a raw Batch API result row."""
+def response_payload(item: dict[str, Any]) -> dict[str, str]:
+    """Return normalized title/html payload from extracted or raw Batch output."""
     # Already-extracted rows carry html directly.
     if "html" in item:
-        return str(item.get("html") or "")
+        payload = {"html": str(item.get("html") or "")}
+        if "title" in item:
+            payload["title"] = str(item.get("title") or "")
+        return payload
 
     # Raw Batch API output needs the model response text extracted first.
-    return response_text(item)
+    text = response_text(item).strip()
+    try:
+        value = json.loads(text)
+    except json.JSONDecodeError:
+        return {"html": text}
+
+    if isinstance(value, dict):
+        return {
+            "title": str(value.get("title") or ""),
+            "html": str(value.get("html") or ""),
+        }
+    return {"html": text}
 
 
 def output_row(item: dict[str, Any], index: int) -> dict[str, Any]:
     """Build one normalized output row with a merged sequential id."""
     # The id is intentionally reassigned after merge; custom_id remains provenance.
-    return {
+    payload = response_payload(item)
+    row = {
         "id": index,
         "custom_id": item.get("custom_id"),
-        "html": clean_html_attributes(row_html(item)),
+        "html": clean_html_attributes(payload.get("html", "")),
     }
+    if "title" in payload and payload["title"]:
+        row["title"] = payload["title"]
+    return row
 
 
 def write_html_jsonl(rows: list[dict[str, Any]], output_path: Path) -> None:
@@ -97,7 +115,7 @@ def write_html_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
     # CSV is convenient for spreadsheet review.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["id", "custom_id", "html"])
+        writer = csv.DictWriter(handle, fieldnames=["id", "custom_id", "title", "html"])
         writer.writeheader()
         for index, item in enumerate(rows):
             writer.writerow(output_row(item, index))
@@ -111,7 +129,7 @@ def write_html_files(rows: list[dict[str, Any]], output_dir: Path) -> None:
         custom_id = str(item.get("custom_id") or f"row-{index:06d}")
         safe_name = "".join(ch if ch.isalnum() or ch in {"-", "_"} else "-" for ch in custom_id)[:180]
         (output_dir / f"{index:04d}-{safe_name}.html").write_text(
-            clean_html_attributes(row_html(item)),
+            output_row(item, index - 1)["html"],
             encoding="utf-8",
         )
 

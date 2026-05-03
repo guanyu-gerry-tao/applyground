@@ -310,14 +310,38 @@ def create_batch(input_file_id: str, api_key: str, metadata: dict[str, str]) -> 
     return http_json("POST", f"{OPENAI_API_BASE}/batches", api_key, body)
 
 
+def resolve_api_key() -> str:
+    """Return the configured API key for real OpenAI API calls."""
+    api_key = os.environ.get("AI_API_KEY") or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        raise ValueError("AI_API_KEY is missing. Add it to data-processing/.env or the environment.")
+    return api_key
+
+
+def download_file(file_id: str, output_path: Path, api_key: str) -> None:
+    """Download an OpenAI file content response to a local path."""
+    request = urllib.request.Request(
+        f"{OPENAI_API_BASE}/files/{file_id}/content",
+        method="GET",
+        headers={"Authorization": f"Bearer {api_key}"},
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        with urllib.request.urlopen(request) as response:
+            output_path.write_bytes(response.read())
+    except urllib.error.HTTPError as exc:
+        detail = exc.read().decode("utf-8", errors="replace")
+        raise RuntimeError(f"OpenAI file download error {exc.code}: {detail}") from exc
+
+
 def main() -> int:
     """Run the batch-input creation and optional submission command."""
     # Define the CLI surface in one place.
     parser = argparse.ArgumentParser(
         description="Create OpenAI Batch API JSONL from a datasource and optionally submit it."
     )
-    parser.add_argument("prompt_md", help="Path to a Markdown prompt file.")
-    parser.add_argument("datasource", help="CSV, JSONL, or Parquet datasource path.")
+    parser.add_argument("prompt_md", nargs="?", help="Path to a Markdown prompt file.")
+    parser.add_argument("datasource", nargs="?", help="CSV, JSONL, or Parquet datasource path.")
     parser.add_argument("--provider", help="Override AI_PROVIDER from env. Currently only openai is supported.")
     parser.add_argument("--model", help="Override AI_MODEL from env.")
     parser.add_argument("--datasource-format", choices=["auto", "csv", "jsonl", "parquet"], default="auto")
@@ -329,10 +353,35 @@ def main() -> int:
     parser.add_argument("--max-output-tokens", type=int, default=2000)
     parser.add_argument("--env", default=str(DEFAULT_ENV_PATH), help="Env file path. Default: data-processing/.env")
     parser.add_argument("--submit", action="store_true", help="Upload the JSONL and create the OpenAI batch.")
+    parser.add_argument("--status-batch", help="Fetch status JSON for an existing OpenAI batch id.")
+    parser.add_argument("--download-batch", help="Download output JSONL for an existing completed OpenAI batch id.")
+    parser.add_argument("--download-output", help="Path for --download-batch output JSONL.")
     args = parser.parse_args()
 
     # Load env config before resolving provider/model/API key.
     load_env(Path(args.env))
+
+    if args.status_batch or args.download_batch:
+        api_key = resolve_api_key()
+        batch_id = args.status_batch or args.download_batch
+        batch = http_json("GET", f"{OPENAI_API_BASE}/batches/{batch_id}", api_key)
+
+        if args.status_batch:
+            print(json.dumps(batch, indent=2, ensure_ascii=False))
+            return 0
+
+        output_file_id = batch.get("output_file_id")
+        if not output_file_id:
+            parser.error(f"Batch {batch_id} has no output_file_id yet; current status is {batch.get('status')}")
+        if not args.download_output:
+            parser.error("--download-output is required with --download-batch")
+        download_file(str(output_file_id), Path(args.download_output), api_key)
+        print(f"Downloaded {output_file_id} to {args.download_output}")
+        return 0
+
+    if not args.prompt_md or not args.datasource:
+        parser.error("prompt_md and datasource are required unless using --status-batch or --download-batch")
+
     provider, model = resolve_provider_model(args.provider, args.model)
 
     # Keep provider dispatch explicit; only OpenAI is implemented today.
@@ -372,9 +421,10 @@ def main() -> int:
         return 0
 
     # Resolve the API key only when a real submission is requested.
-    api_key = os.environ.get("AI_API_KEY") or os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        parser.error("AI_API_KEY is missing. Add it to data-processing/.env or the environment.")
+    try:
+        api_key = resolve_api_key()
+    except ValueError as exc:
+        parser.error(str(exc))
 
     # Upload the JSONL and create the asynchronous batch job.
     uploaded = upload_file(output_path, api_key)

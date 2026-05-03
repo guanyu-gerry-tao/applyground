@@ -145,9 +145,15 @@ vite.config.ts.timestamp-*
 # Local scratch (external fixtures, draft data, experiments)
 tmp/
 
+# Python runtime caches
+__pycache__/
+*.py[cod]
+
 # Data processing workspace
 data-processing/raw/**
 !data-processing/raw/.gitkeep
+data-processing/generated/**
+!data-processing/generated/.gitkeep
 data-processing/output/**
 !data-processing/output/.gitkeep
 

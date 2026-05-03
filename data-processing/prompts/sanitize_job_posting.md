@@ -1,8 +1,11 @@
-# Sanitize Job Posting HTML
+# Sanitize Job Posting
 
-You will receive one HTML fragment from a real job posting.
+You will receive one JSON object from a real job posting. The object includes:
 
-Return one sanitized HTML fragment.
+- `title`: the source job title.
+- `description_html`: the source job posting HTML fragment.
+
+Return one JSON object with a sanitized core title and sanitized HTML.
 
 ## Core Rules
 
@@ -11,7 +14,8 @@ Return one sanitized HTML fragment.
 - Keep ordinary semantic tags such as `p`, `div`, `section`, `h1`, `h2`, `h3`, `h4`, `ul`, `ol`, `li`, `strong`, `em`, `span`, `br`, and tables when they are useful.
 - Do not output Markdown.
 - Do not wrap the output in code fences.
-- Do not add explanations, comments, JSON, citations, or notes.
+- Do not add explanations, comments, citations, or notes.
+- Output valid JSON only.
 
 ## Sanitization Rules
 
@@ -46,6 +50,27 @@ Return one sanitized HTML fragment.
 - Preserve normal employment details when useful, such as remote/hybrid/on-site, salary range, years of experience, shift expectations, and travel expectations.
 - Keep the realistic job-posting texture. Do not make the posting dramatically more polished, more cheerful, more concise, or more generic than the source.
 
+## Title Rules
+
+- Return `title` as a short core role title only.
+- Preserve seniority and role family when they are part of the core role, such as `Intern`, `Junior`, `Senior`, `Staff`, `Principal`, `Lead`, or `Engineering Manager`.
+- Remove everything after comma-separated, dash-separated, slash-separated, colon-separated, or parenthesized qualifiers when those qualifiers are team, product, location, cohort, year, department, business unit, employer, platform, or program details.
+- Remove real employer, platform, product, internal team, business unit, project, location, and cohort terms from `title`.
+- Do not include company names or placeholders in `title`.
+- Do not include `{{COMPANY_NAME}}`, `{{NPC_PRODUCT}}`, `{{NPC_NAME}}`, URLs, locations, dates, years, requisition IDs, or tags in `title`.
+- Keep `title` boring and reusable. Prefer forms like `Senior Software Engineer`, `Staff Machine Learning Engineer`, `Data Engineer Intern`, or `Engineering Manager`.
+- If the source title has multiple qualifiers, keep only the leftmost core role phrase.
+
+Examples:
+
+- `Senior Software Engineer, Network Performance & Reliability` -> `Senior Software Engineer`
+- `Software Engineer, Airbnb - New Grad` -> `Software Engineer`
+- `Principal Software Engineer - Vector Search - Elasticsearch` -> `Principal Software Engineer`
+- `Senior Fullstack Engineer, Waymo for Business` -> `Senior Fullstack Engineer`
+- `Data Engineer Intern - Pune (2026)` -> `Data Engineer Intern`
+- `Sr. Software Engineer, Flight Software (Starship)` -> `Sr. Software Engineer`
+- `Engineering Manager, Community Support Engineering (Routing and Data Services)` -> `Engineering Manager`
+
 ## Examples
 
 Preserve applicant skill requirements such as:
@@ -73,6 +98,15 @@ Replace or generalize employer-identifying names such as:
 
 ## Output
 
-Return only the sanitized HTML fragment.
+Return exactly one JSON object with this shape:
+
+```json
+{
+  "title": "Senior Software Engineer",
+  "html": "<p>Sanitized posting HTML...</p>"
+}
+```
+
+The `title` value must be plain text. The `html` value must be the sanitized HTML fragment.
 
 Before returning, check the result once more for real employer names, real product names, real URLs, email addresses, phone numbers, recruiter names, exact addresses, `href=`, `src=`, `srcset=`, and `data-*` attributes. Fix any remaining occurrence before final output.
