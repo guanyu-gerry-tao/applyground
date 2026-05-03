@@ -168,6 +168,25 @@ export function saveLatestToSession(submission: Submission): void {
   }
 }
 
+export function buildScoreUrl(scenarioId: ScenarioId, submission: Submission): string {
+  const search = new URLSearchParams(window.location.search);
+  const jdId = search.get('id') ?? '0';
+  const dataset = search.get('dataset');
+  const seconds = Math.max(0, Math.round(performance.now() / 1000));
+  const filledPercent = submission.score.maxPoints > 0
+    ? Math.round((submission.score.points / submission.score.maxPoints) * 100)
+    : 0;
+
+  const scoreSearch = new URLSearchParams({
+    sec: String(seconds),
+    filled: `${filledPercent}%`,
+    id: jdId,
+  });
+  if (dataset) scoreSearch.set('dataset', dataset);
+
+  return `/score/${scenarioId}?${scoreSearch.toString()}`;
+}
+
 export function loadLatestFromSession(scenarioId: ScenarioId): Submission | null {
   try {
     const raw = sessionStorage.getItem(SUBMISSION_STORAGE_KEY);

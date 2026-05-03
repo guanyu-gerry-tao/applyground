@@ -9,7 +9,7 @@ import ShadowField from '../../../components/ShadowField';
 import ValidationSummary from '../../../components/ValidationSummary';
 import WeirdSelect from '../../../components/WeirdSelect';
 import { findScenarioMeta } from '../../../data/scenarios';
-import { buildSubmission, saveLatestToSession } from '../../../lib/submission';
+import { buildScoreUrl, buildSubmission, saveLatestToSession } from '../../../lib/submission';
 import type {
   SubmissionFileMetadata,
   SubmissionValidationResult,
@@ -49,7 +49,7 @@ export default function HostileEdgeCases() {
     setValidation(submission.validation);
     if (!submission.validation.passed) return;
     saveLatestToSession(submission);
-    navigate(`/confirmation/${SCENARIO_ID}`);
+    navigate(buildScoreUrl(SCENARIO_ID, submission));
   };
 
   return (

@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 interface MultiStepModalProps {
   open: boolean;
@@ -18,7 +19,7 @@ export default function MultiStepModal({
   children,
 }: MultiStepModalProps) {
   if (!open) return null;
-  return (
+  return createPortal(
     <div data-modal-overlay="" role="dialog" aria-modal="true" aria-label={title}>
       <div data-modal-window="">
         <header data-modal-header="">
@@ -32,6 +33,7 @@ export default function MultiStepModal({
         </header>
         <div data-modal-body="">{children}</div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
