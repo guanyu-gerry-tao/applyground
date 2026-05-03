@@ -56,13 +56,14 @@ def load_output_rows(path: Path) -> list[dict[str, Any]]:
 
 def write_html_jsonl(rows: list[dict[str, Any]], output_path: Path) -> None:
     """Write one JSONL row per generated HTML fragment."""
-    # JSONL keeps custom_id next to the extracted HTML for later joins.
+    # JSONL keeps a stable local id plus custom_id for later joins.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as handle:
-        for item in rows:
+        for index, item in enumerate(rows):
             handle.write(
                 json.dumps(
                     {
+                        "id": index,
                         "custom_id": item.get("custom_id"),
                         "html": clean_html_attributes(response_text(item)),
                     },
@@ -77,10 +78,16 @@ def write_html_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
     # CSV is convenient for spreadsheet review.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=["custom_id", "html"])
+        writer = csv.DictWriter(handle, fieldnames=["id", "custom_id", "html"])
         writer.writeheader()
-        for item in rows:
-            writer.writerow({"custom_id": item.get("custom_id"), "html": clean_html_attributes(response_text(item))})
+        for index, item in enumerate(rows):
+            writer.writerow(
+                {
+                    "id": index,
+                    "custom_id": item.get("custom_id"),
+                    "html": clean_html_attributes(response_text(item)),
+                }
+            )
 
 
 def write_html_files(rows: list[dict[str, Any]], output_dir: Path) -> None:
