@@ -39,7 +39,7 @@ def clean_html_attributes(html: str) -> str:
 
 
 def load_output_rows(path: Path) -> list[dict[str, Any]]:
-    """Load OpenAI Batch API output JSONL rows."""
+    """Load JSONL rows from one Batch API or extracted HTML file."""
     # Keep this strict so malformed batch outputs fail loudly.
     rows: list[dict[str, Any]] = []
     with path.open(encoding="utf-8") as handle:
@@ -54,23 +54,42 @@ def load_output_rows(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def load_all_output_rows(paths: list[Path]) -> list[dict[str, Any]]:
+    """Load and concatenate JSONL rows from multiple input paths."""
+    # Inputs are merged in CLI order so final ids are predictable.
+    rows: list[dict[str, Any]] = []
+    for path in paths:
+        rows.extend(load_output_rows(path))
+    return rows
+
+
+def row_html(item: dict[str, Any]) -> str:
+    """Return HTML from an extracted row or a raw Batch API result row."""
+    # Already-extracted rows carry html directly.
+    if "html" in item:
+        return str(item.get("html") or "")
+
+    # Raw Batch API output needs the model response text extracted first.
+    return response_text(item)
+
+
+def output_row(item: dict[str, Any], index: int) -> dict[str, Any]:
+    """Build one normalized output row with a merged sequential id."""
+    # The id is intentionally reassigned after merge; custom_id remains provenance.
+    return {
+        "id": index,
+        "custom_id": item.get("custom_id"),
+        "html": clean_html_attributes(row_html(item)),
+    }
+
+
 def write_html_jsonl(rows: list[dict[str, Any]], output_path: Path) -> None:
     """Write one JSONL row per generated HTML fragment."""
     # JSONL keeps a stable local id plus custom_id for later joins.
     output_path.parent.mkdir(parents=True, exist_ok=True)
     with output_path.open("w", encoding="utf-8") as handle:
         for index, item in enumerate(rows):
-            handle.write(
-                json.dumps(
-                    {
-                        "id": index,
-                        "custom_id": item.get("custom_id"),
-                        "html": clean_html_attributes(response_text(item)),
-                    },
-                    ensure_ascii=False,
-                )
-                + "\n"
-            )
+            handle.write(json.dumps(output_row(item, index), ensure_ascii=False) + "\n")
 
 
 def write_html_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
@@ -81,13 +100,7 @@ def write_html_csv(rows: list[dict[str, Any]], output_path: Path) -> None:
         writer = csv.DictWriter(handle, fieldnames=["id", "custom_id", "html"])
         writer.writeheader()
         for index, item in enumerate(rows):
-            writer.writerow(
-                {
-                    "id": index,
-                    "custom_id": item.get("custom_id"),
-                    "html": clean_html_attributes(response_text(item)),
-                }
-            )
+            writer.writerow(output_row(item, index))
 
 
 def write_html_files(rows: list[dict[str, Any]], output_dir: Path) -> None:
@@ -98,7 +111,7 @@ def write_html_files(rows: list[dict[str, Any]], output_dir: Path) -> None:
         custom_id = str(item.get("custom_id") or f"row-{index:06d}")
         safe_name = "".join(ch if ch.isalnum() or ch in {"-", "_"} else "-" for ch in custom_id)[:180]
         (output_dir / f"{index:04d}-{safe_name}.html").write_text(
-            clean_html_attributes(response_text(item)),
+            clean_html_attributes(row_html(item)),
             encoding="utf-8",
         )
 
@@ -122,14 +135,25 @@ def main() -> int:
     """Run the batch HTML extraction command."""
     # Define the CLI surface in one place.
     parser = argparse.ArgumentParser(description="Extract generated HTML from OpenAI Batch output JSONL.")
-    parser.add_argument("input", help="OpenAI Batch output JSONL path.")
-    parser.add_argument("output", help="Output .jsonl/.csv file or directory for .html files.")
+    parser.add_argument(
+        "paths",
+        nargs="+",
+        help=(
+            "Input JSONL path(s), followed by output .jsonl/.csv path or output directory. "
+            "Inputs may be raw OpenAI Batch output or already extracted HTML JSONL."
+        ),
+    )
     parser.add_argument("--mode", choices=["jsonl", "csv", "files"], help="Output mode. Defaults from output path.")
     args = parser.parse_args()
+    if len(args.paths) < 2:
+        parser.error("Provide at least one input path and one output path.")
 
-    # Load raw batch output and choose the destination format.
-    rows = load_output_rows(Path(args.input))
-    output_path = Path(args.output)
+    # Treat the final positional path as output and all earlier paths as inputs.
+    input_paths = [Path(path) for path in args.paths[:-1]]
+    output_path = Path(args.paths[-1])
+
+    # Load raw or extracted rows and choose the destination format.
+    rows = load_all_output_rows(input_paths)
     mode = infer_mode(output_path, args.mode)
 
     # Write the extracted HTML in the requested format.
@@ -142,7 +166,7 @@ def main() -> int:
     else:
         parser.error(f"Unsupported mode: {mode}")
 
-    print(f"Extracted {len(rows)} rows to {output_path}")
+    print(f"Extracted {len(rows)} rows from {len(input_paths)} input file(s) to {output_path}")
     return 0
 
 
