@@ -163,6 +163,3 @@ data-processing/output/**
 # should not enter git.
 .superpowers/
 docs/superpowers/**
-!docs/superpowers/
-!docs/superpowers/specs/
-!docs/superpowers/specs/**
