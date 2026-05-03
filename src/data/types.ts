@@ -54,10 +54,10 @@ export const APPLICATION_TYPES: ApplicationType[] = [
     id: 'edge-cases',
     title: 'Edge cases',
     shortDescription:
-      'Difficult-but-legal interaction patterns: ambiguous labels, delayed sections, hidden honeypots, weird controls.',
+      'Difficult-but-legal interaction patterns with extra steps, nonstandard controls, and careful-reading checks.',
     examples: ['hostile-edge-cases', 'mild-edge-cases'],
     notes:
-      'Stress test for browser automation. Each fixture is documented in-page so an agent operator can recognise the trap.',
+      'Stress test for browser automation. Operator guidance lives in the JD Options panel rather than the page body.',
   },
 ];
 

@@ -30,8 +30,8 @@ export default function WeirdSelect({
 }: WeirdSelectProps) {
   const [open, setOpen] = useState(false);
   const id = useId();
-  const buttonId = `weird-${id}`;
-  const listId = `weird-${id}-list`;
+  const buttonId = `choice-${id}`;
+  const listId = `choice-${id}-list`;
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,7 +49,7 @@ export default function WeirdSelect({
     <div
       data-field={name}
       data-required={required ? 'true' : 'false'}
-      data-kind="custom-select"
+      data-control-surface="choice"
       ref={containerRef}
     >
       <p>
@@ -67,7 +67,6 @@ export default function WeirdSelect({
         aria-haspopup="listbox"
         aria-controls={listId}
         aria-invalid={error ? 'true' : 'false'}
-        data-action="toggle-weird-select"
         onClick={() => setOpen((o) => !o)}
       >
         {current ? current.label : placeholder}
@@ -75,13 +74,12 @@ export default function WeirdSelect({
       {/* hidden input keeps name/value discoverable for form-data style scrapers */}
       <input type="hidden" name={name} value={value} />
       {open && (
-        <ul id={listId} role="listbox" data-weird-list="">
+        <ul id={listId} role="listbox" data-choice-list="">
           {options.map((opt) => (
             <li
               key={opt.value}
               role="option"
               aria-selected={value === opt.value}
-              data-option-value={opt.value}
               tabIndex={0}
               onClick={() => {
                 onChange(opt.value);

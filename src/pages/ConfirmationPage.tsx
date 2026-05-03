@@ -51,17 +51,19 @@ export default function ConfirmationPage() {
           <dd>{submission.scenarioId}</dd>
           <dt>Submitted at</dt>
           <dd>{submission.submittedAt}</dd>
-          <dt>Validation</dt>
+          <dt>Required answers</dt>
           <dd>
-            {submission.validation.passed ? 'passed' : 'failed'}
+            {submission.validation.passed ? 'complete' : 'incomplete'}
             {submission.validation.missingRequiredFields.length > 0 && (
               <> — missing: {submission.validation.missingRequiredFields.join(', ')}</>
             )}
           </dd>
+          <dt>Final result</dt>
+          <dd>{submission.score.passed ? 'passed' : 'failed'}</dd>
           <dt>Score</dt>
           <dd>
             {submission.score.points} / {submission.score.maxPoints}
-            {submission.score.passed ? ' (passed)' : ''}
+            {submission.score.passed ? ' (passed)' : ' (failed)'}
           </dd>
         </dl>
         {submission.score.notes.length > 0 && (

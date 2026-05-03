@@ -26,7 +26,7 @@ export default function ShadowField({
   const hostRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const id = useId();
-  const fieldId = `shadow-${id}`;
+  const fieldId = `field-${id}`;
 
   useEffect(() => {
     const host = hostRef.current;
@@ -59,13 +59,9 @@ export default function ShadowField({
   }, [value]);
 
   return (
-    <div data-field={name} data-required={required ? 'true' : 'false'} data-kind="shadow-dom">
-      <p>
-        <strong>Shadow DOM field below.</strong> The textarea is attached inside an open shadow
-        root on the next element. Agents must traverse shadow DOM to fill it.
-      </p>
+    <div data-field={name} data-required={required ? 'true' : 'false'}>
       {description && <p data-field-description="">{description}</p>}
-      <div ref={hostRef} data-shadow-host={name} />
+      <div ref={hostRef} />
     </div>
   );
 }

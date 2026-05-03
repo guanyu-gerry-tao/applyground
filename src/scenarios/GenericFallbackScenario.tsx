@@ -56,7 +56,12 @@ export default function GenericFallbackScenario({ meta }: GenericFallbackScenari
               />
             );
           }
-          if (f.name === 'coverNote' || f.name === 'whyInterested' || f.name === 'shadowComment') {
+          if (
+            f.name === 'coverNote' ||
+            f.name === 'whyInterested' ||
+            f.name === 'shadowComment' ||
+            f.name === 'additionalInfo'
+          ) {
             return (
               <TextareaField
                 key={f.name}

@@ -73,11 +73,11 @@ export default function ScorePage() {
   const filled = scoreParams.filled ?? '0%';
   const elapsedLabel = formatElapsedSeconds(seconds);
   const rawSeconds = String(parseNonNegativeSeconds(seconds));
-  const validationLabel = submission
-    ? (submission.validation.passed ? 'Passed' : 'Failed')
+  const resultLabel = submission
+    ? (submission.score.passed ? 'Passed' : 'Failed')
     : 'No local submission';
   const scoreState = submission
-    ? (submission.validation.passed ? 'passed' : 'failed')
+    ? (submission.score.passed ? 'passed' : 'failed')
     : 'unknown';
   const scoreLabel = submission
     ? `${submission.score.points} / ${submission.score.maxPoints}`
@@ -103,7 +103,7 @@ export default function ScorePage() {
             data-score-status=""
             data-state={scoreState}
           >
-            {validationLabel}
+            {resultLabel}
           </span>
         </div>
 
@@ -121,7 +121,7 @@ export default function ScorePage() {
           <div data-score-metric="rubric">
             <dt>Rubric score</dt>
             <dd>{scoreLabel}</dd>
-            <p>Computed in this browser only.</p>
+            <p>Anything below full score fails.</p>
           </div>
         </dl>
 
@@ -138,13 +138,21 @@ export default function ScorePage() {
           )}
           {submission && (
             <>
-              <dt>Validation</dt>
+              <dt>Required answers</dt>
               <dd>
-                {submission.validation.passed ? 'passed' : 'failed'}
+                {submission.validation.passed ? 'complete' : 'incomplete'}
                 {submission.validation.missingRequiredFields.length > 0 && (
                   <> - missing: {submission.validation.missingRequiredFields.join(', ')}</>
                 )}
               </dd>
+              <dt>Final result</dt>
+              <dd>{submission.score.passed ? 'passed' : 'failed'}</dd>
+              {submission.score.notes.length > 0 && (
+                <>
+                  <dt>Notes</dt>
+                  <dd>{submission.score.notes.join(' ')}</dd>
+                </>
+              )}
             </>
           )}
         </dl>

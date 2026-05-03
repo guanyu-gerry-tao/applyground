@@ -13,10 +13,10 @@ const SRC_DOC = `<!doctype html>
 <html>
   <head><meta charset="utf-8" /></head>
   <body>
-    <p>Upload a resume (this region is in an iframe).</p>
-    <input id="iframe-upload-input" type="file" />
+    <p>Upload your resume.</p>
+    <input id="upload-input" type="file" />
     <script>
-      const input = document.getElementById('iframe-upload-input');
+      const input = document.getElementById('upload-input');
       input.addEventListener('change', () => {
         const files = Array.from(input.files || []).map((f) => ({
           name: f.name,
@@ -24,7 +24,7 @@ const SRC_DOC = `<!doctype html>
           size: f.size,
           lastModified: f.lastModified,
         }));
-        window.parent.postMessage({ kind: 'applyground:iframe-upload', files }, '*');
+        window.parent.postMessage({ kind: 'applyground:file-bridge', files }, '*');
       });
     </script>
   </body>
@@ -46,7 +46,7 @@ export default function IframeUploadRegion({
       const data = event.data as
         | { kind?: string; files?: Array<{ name: string; type: string; size: number; lastModified: number }> }
         | undefined;
-      if (!data || data.kind !== 'applyground:iframe-upload') return;
+      if (!data || data.kind !== 'applyground:file-bridge') return;
       const files = (data.files ?? []).map((f) => ({ field, ...f }));
       onChange(files);
     };
@@ -55,24 +55,22 @@ export default function IframeUploadRegion({
   }, [field, onChange]);
 
   return (
-    <div data-field={field} data-required={required ? 'true' : 'false'} data-kind="iframe-upload">
-      <p data-iframe-upload-label="" id={`iframe-${id}-label`}>
+    <div data-field={field} data-required={required ? 'true' : 'false'} data-upload-region="">
+      <p id={`field-${id}-label`}>
         <strong>{label}</strong>
         {required && <span aria-hidden="true"> *</span>}
       </p>
       <p>
         <small>
-          The actual upload control lives inside the iframe below. Agents must enter the frame to
-          interact with it.
+          Accepted formats: PDF, DOC, or DOCX.
         </small>
       </p>
       <iframe
         ref={ref}
-        title={`iframe-upload-${field}`}
-        data-iframe-upload-frame={field}
+        title={`${field}-upload`}
         srcDoc={SRC_DOC}
         sandbox="allow-scripts allow-same-origin"
-        aria-labelledby={`iframe-${id}-label`}
+        aria-labelledby={`field-${id}-label`}
       />
       {value.length > 0 && (
         <ul data-file-list="">

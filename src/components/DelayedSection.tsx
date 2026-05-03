@@ -20,17 +20,17 @@ export default function DelayedSection({ title, delayMs = 800, children }: Delay
   }, [delayMs]);
 
   return (
-    <section data-section="delayed-reveal" data-state={revealed ? 'revealed' : ready ? 'ready' : 'loading'}>
+    <section data-section="extra-questions" data-state={revealed ? 'revealed' : ready ? 'ready' : 'loading'}>
       <h3>{title}</h3>
       {!ready && <p data-loading-indicator="">Loading additional questions…</p>}
       {ready && !revealed && (
         <p>
-          <button type="button" data-action="reveal-delayed" onClick={() => setRevealed(true)}>
+          <button type="button" onClick={() => setRevealed(true)}>
             Show additional questions
           </button>
         </p>
       )}
-      {revealed && <div data-delayed-content="">{children}</div>}
+      {revealed && <div>{children}</div>}
     </section>
   );
 }

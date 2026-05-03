@@ -7,10 +7,6 @@ interface AmbiguousLabelGroupProps {
   onEmailChange: (v: string) => void;
 }
 
-/**
- * Two fields where the visible labels are ambiguous ("Name" and "Name *")
- * and the real distinction is in the placeholders / autocomplete hints.
- */
 export default function AmbiguousLabelGroup({
   fullName,
   email,
@@ -18,13 +14,11 @@ export default function AmbiguousLabelGroup({
   onEmailChange,
 }: AmbiguousLabelGroupProps) {
   return (
-    <fieldset data-field-group="ambiguous-labels">
+    <fieldset data-field-group="personal-info">
       <legend>Personal info</legend>
       <p>
         <small>
-          Both fields below are labelled with similarly ambiguous text. The autocomplete and
-          placeholder are the only signal of which is which. This is intentional — agents must
-          look beyond the visible label.
+          Please enter your legal name and preferred contact email.
         </small>
       </p>
       <Field
@@ -38,7 +32,7 @@ export default function AmbiguousLabelGroup({
       />
       <Field
         name="email"
-        label="Name"
+        label="Email"
         required
         kind="email"
         value={email}
