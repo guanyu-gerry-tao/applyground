@@ -9,6 +9,19 @@
 - 不依赖真实后端或数据库
 - 最终输出是普通 JSONL，后续前端可以静态读取
 
+当前已提交的 fixture `big_company_cs_1000` 派生自 Hugging Face 上的
+[`edwarddgao/open-apply-jobs`](https://huggingface.co/datasets/edwarddgao/open-apply-jobs)，
+也叫 **Open-Apply Jobs**。上游数据集收集来自公开 ATS API 的 active postings，例如
+Greenhouse、Lever、Ashby。Applyground 使用的是抽样、脱敏、NPC 重命名后的派生数据，
+不是上游原始行。
+
+模型辅助脱敏步骤使用
+[OpenAI Batch API](https://platform.openai.com/docs/guides/batch)，每条 Batch request
+指向 Responses endpoint（`/v1/responses`）。当前已提交 fixture 的配置使用
+[`gpt-4.1-mini`](https://platform.openai.com/docs/models/gpt-4.1-mini)，OpenAI 文档中
+该模型支持 Responses 和 Batch。`completion_window`、`endpoint`、Batch input file 等
+要求见 [Batch API reference](https://platform.openai.com/docs/api-reference/batch)。
+
 ## 目录结构
 
 - `raw/` 放本地源数据、OpenAI Batch 输入和 Batch 输出。除 `.gitkeep` 外默认忽略。
@@ -90,7 +103,20 @@
 
 1. 把源文件放到 `data-processing/raw/` 下。
 
-2. 创建 Batch 输入。这里要用 `--columns title,description_html`，不要再用 `--text-column description_html`，因为 prompt 需要同时看到 title 和 HTML。
+2. 从示例创建本地 env 文件，并填入 API key。当前 fixture workflow 使用 OpenAI 和
+   `gpt-4.1-mini`：
+
+```bash
+cp data-processing/.env.example data-processing/.env
+```
+
+```env
+AI_PROVIDER=openai
+AI_MODEL=gpt-4.1-mini
+AI_API_KEY=sk-...
+```
+
+3. 创建 Batch 输入。这里要用 `--columns title,description_html`，不要再用 `--text-column description_html`，因为 prompt 需要同时看到 title 和 HTML。
 
 ```bash
 python3 data-processing/scripts/submit_batch.py \
@@ -113,7 +139,7 @@ python3 data-processing/scripts/submit_batch.py \
   --download-output data-processing/raw/batches/big_company_cs_1000_part1_html.output.jsonl
 ```
 
-3. Batch 完成后提取模型输出：
+4. Batch 完成后提取模型输出：
 
 ```bash
 python3 data-processing/scripts/extract_batch_html.py \
@@ -123,7 +149,7 @@ python3 data-processing/scripts/extract_batch_html.py \
 
 如果有多个 Batch 分片，先传所有输入文件，最后一个参数放输出路径。
 
-4. 按 clean HTML 的行数生成 NPC 池：
+5. 按 clean HTML 的行数生成 NPC 池：
 
 ```bash
 python3 data-processing/scripts/generate_npc_pool.py \
@@ -132,7 +158,7 @@ python3 data-processing/scripts/generate_npc_pool.py \
   --output data-processing/generated/big_company_cs_1000_npc_identity_pool.jsonl
 ```
 
-5. 应用 NPC 替换：
+6. 应用 NPC 替换：
 
 ```bash
 python3 data-processing/scripts/apply_npc_replacements.py \
@@ -141,7 +167,7 @@ python3 data-processing/scripts/apply_npc_replacements.py \
   data-processing/output/big_company_cs_1000.npc_html.jsonl
 ```
 
-6. 加上职位等级并写最终数据集：
+7. 加上职位等级并写最终数据集：
 
 ```bash
 python3 data-processing/scripts/add_job_levels.py \

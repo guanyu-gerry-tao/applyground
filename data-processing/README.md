@@ -9,6 +9,21 @@ The goal is to turn real-source job rows into neutral fake postings that are saf
 - no backend or database dependency
 - final output is plain JSONL that the frontend can read later
 
+The current committed fixture, `big_company_cs_1000`, is derived from
+[`edwarddgao/open-apply-jobs`](https://huggingface.co/datasets/edwarddgao/open-apply-jobs),
+the Hugging Face dataset also known as **Open-Apply Jobs**. The upstream dataset
+collects active postings from public ATS APIs such as Greenhouse, Lever, and
+Ashby. Applyground uses a sampled, sanitized, NPC-renamed derivative, not the raw
+upstream rows.
+
+The model-assisted sanitization step uses the
+[OpenAI Batch API](https://platform.openai.com/docs/guides/batch) with requests
+targeting the Responses endpoint (`/v1/responses`). The checked-in configuration
+uses [`gpt-4.1-mini`](https://platform.openai.com/docs/models/gpt-4.1-mini),
+which OpenAI documents as supporting both Responses and Batch. See the
+[Batch API reference](https://platform.openai.com/docs/api-reference/batch) for
+the `completion_window`, `endpoint`, and batch input file requirements.
+
 ## Directory Layout
 
 - `raw/` stores local source data, OpenAI Batch inputs, and Batch outputs. It is ignored except for `.gitkeep`.
@@ -90,7 +105,20 @@ Tests:
 
 1. Put source files under `data-processing/raw/`.
 
-2. Create Batch input. Use `--columns title,description_html`; do not use `--text-column description_html`, because the prompt expects both title and HTML.
+2. Create a local env file from the example and add your API key. The current
+   fixture workflow used OpenAI with `gpt-4.1-mini`:
+
+```bash
+cp data-processing/.env.example data-processing/.env
+```
+
+```env
+AI_PROVIDER=openai
+AI_MODEL=gpt-4.1-mini
+AI_API_KEY=sk-...
+```
+
+3. Create Batch input. Use `--columns title,description_html`; do not use `--text-column description_html`, because the prompt expects both title and HTML.
 
 ```bash
 python3 data-processing/scripts/submit_batch.py \
@@ -113,7 +141,7 @@ python3 data-processing/scripts/submit_batch.py \
   --download-output data-processing/raw/batches/big_company_cs_1000_part1_html.output.jsonl
 ```
 
-3. After Batch completion, extract the model output:
+4. After Batch completion, extract the model output:
 
 ```bash
 python3 data-processing/scripts/extract_batch_html.py \
@@ -123,7 +151,7 @@ python3 data-processing/scripts/extract_batch_html.py \
 
 For multiple Batch parts, pass all input files first and the output path last.
 
-4. Generate an NPC pool with the same row count as the clean HTML file:
+5. Generate an NPC pool with the same row count as the clean HTML file:
 
 ```bash
 python3 data-processing/scripts/generate_npc_pool.py \
@@ -132,7 +160,7 @@ python3 data-processing/scripts/generate_npc_pool.py \
   --output data-processing/generated/big_company_cs_1000_npc_identity_pool.jsonl
 ```
 
-5. Apply NPC replacements:
+6. Apply NPC replacements:
 
 ```bash
 python3 data-processing/scripts/apply_npc_replacements.py \
@@ -141,7 +169,7 @@ python3 data-processing/scripts/apply_npc_replacements.py \
   data-processing/output/big_company_cs_1000.npc_html.jsonl
 ```
 
-6. Add level metadata and write the final dataset:
+7. Add level metadata and write the final dataset:
 
 ```bash
 python3 data-processing/scripts/add_job_levels.py \

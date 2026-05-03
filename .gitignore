@@ -163,3 +163,7 @@ data-processing/output/**
 # should not enter git.
 .superpowers/
 docs/superpowers/**
+
+# AI
+AGENTS.md
+CLAUDE.md

@@ -2,6 +2,20 @@
 
 This folder stores static JSONL datasets loaded by the frontend. The browser reads `manifest.json`, then loads the selected dataset URL.
 
+> 中文版：[README_zh.md](./README_zh.md)
+
+## Committed Dataset Source
+
+The committed `big_company_cs_1000` fixture is derived from
+[`edwarddgao/open-apply-jobs`](https://huggingface.co/datasets/edwarddgao/open-apply-jobs),
+the Hugging Face dataset also known as **Open-Apply Jobs**. The upstream dataset
+collects active postings from public ATS APIs such as Greenhouse, Lever, and
+Ashby.
+
+Applyground does not ship those raw rows directly. The checked-in JSONL is a
+sampled, sanitized, NPC-renamed derivative intended for local form-automation
+testing.
+
 ## Dataset Format
 
 Each dataset is a `.jsonl` file. Each line is one job object:
