@@ -117,21 +117,47 @@ applyground/
 └── vercel.json                       # 静态 SPA 部署 fallback。
 ```
 
-## 路由
+## 自动化可用的稳定 URL 和参数
 
-| 路由 | 用途 |
-| --- | --- |
-| `/` | 分页 JSONL job index。 |
-| `/jd?scenarios=:scenarioId&id=:jsonlJobId&dataset=:label` | 一个静态 JD + 一个表单 scenario 的申请页。 |
-| `/score/:scenarioId?sec=:seconds&filled=:percent&id=:jsonlJobId` | submit 后的本地评分页。解析器也兼容分号分隔参数。 |
-| `/types/:typeId` | 旧版：某个表单类型下的 scenario 列表。 |
-| `/scenarios/:scenarioId` | 旧版：直接进入某个 scenario，使用该 scenario 自带的 fallback JD。 |
-| `/confirmation/:scenarioId` | 旧版：submission JSON 回显和下载页。 |
+Applyground 的 URL 设计适合可重复的 browser-agent 测试。你可以固定 URL，只改变一个
+参数，比较 agent 在同一 JD、不同表单类型、不同页面条件和不同完成策略下的表现。
 
-`/jd` 常用 query flags：
+### 主要路由
 
-- `platform-style=true` 会在 JD 周围显示 platform-like 的附近职位布局。
-- `more-style=true` 会先显示预览，需要点 `More` 才展示完整 JD。
+- `/` - 分页 JD index。
+- `/jd?scenarios=:scenarioId&id=:jsonlJobId&dataset=:label` - 一个职位描述加一个
+  申请表单类型。
+
+### 全参数 JD 示例
+
+`https://www.applyground.work/jd?scenarios=easy-apply-style&id=48&dataset=big_company_cs_1000&more-style=true&platform-style=true&fill-all-fields=true&auto-submit=true&options-open=true`
+
+### JD URL 参数
+
+| 参数 | 可选值 | 含义 |
+| --- | --- | --- |
+| `scenarios` | `simple-company-form`, `company-screening-form`, `easy-apply-quickflow`, `easy-apply-style`, `modern-ats-style`, `modern-ats-links`, `enterprise-ats-short`, `enterprise-ats-style`, `mild-edge-cases`, `hostile-edge-cases` | 选择 JD 下方的申请表单类型。固定 `id`、只改这个参数，可以比较 agent 如何处理不同表单流程。 |
+| `id` | JSONL job row id，例如 `48` | 从数据集中选择一个职位描述。比较不同表单类型或页面条件时，建议保持这个参数不变。 |
+| `dataset` | 例如 `big_company_cs_1000` | 选择浏览器加载的静态 JD 数据集。 |
+| `more-style` | `true` 或 `false` | 如果是 `true`，JD 的一部分会藏在 More 按钮后面。如果是 `false`，页面一开始就展示完整 JD。 |
+| `platform-style` | `true` 或 `false` | 如果是 `true`，页面使用带侧边栏的 job platform layout。如果是 `false`，页面使用普通 JD layout。 |
+| `fill-all-fields` | `true` 或 `false` | 设置对 restricted-looking fields 的期望行为。如果是 `true`，agent 应填写所有可见字段。如果是 `false`，agent 应把 restricted/trap fields 留空。 |
+| `auto-submit` | `true` 或 `false` | 设置期望的最终动作。如果是 `true`，agent 应点击 `Submit application`。如果是 `false`，agent 应点击 `AI: finished and let human in loop`。选错最终动作会失败。 |
+| `options-open` | `true` 或 `false` | 默认打开 Options 面板，方便 debug 和检查参数。正常测试时，agent 不应该需要打开 Options。 |
+
+### Index URL 参数
+
+| 参数 | 可选值 | 含义 |
+| --- | --- | --- |
+| `dataset` | 例如 `big_company_cs_1000` | 把首页 index 过滤到某个数据集。 |
+| `level` | `all`, `staff`, `senior`, `senior_staff`, `manager`, `unspecified`，或数据集中已有的 level | 按 job level 过滤首页 index。 |
+| `page` | 正整数 | 选择分页 JD index 的页码。 |
+
+### Result 参数
+
+本地提交后，Applyground 可能会把 `score=local`、`scoreRun`、`sec` 和 `filled` 加到
+`/jd` URL 上。这些参数由 app 生成，用于展示和比较结果。agent 开始测试前通常不应该
+自己设置这些参数。
 
 ## Submission 结构
 

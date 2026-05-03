@@ -164,11 +164,6 @@ body {
   font-size: 0.9rem;
 }
 
-[data-app-footer] p {
-  margin-bottom: var(--gap-sm);
-  max-width: var(--line-length);
-}
-
 [data-app-footer] a {
   color: var(--accent);
 }
@@ -208,6 +203,12 @@ h3 {
 p {
   margin: 0 0 var(--gap-sm);
   max-width: var(--line-length);
+}
+
+[data-app-footer] > p {
+  width: 100%;
+  max-width: none;
+  margin-bottom: var(--gap-sm);
 }
 
 a {
@@ -301,6 +302,88 @@ code {
   font-size: 0.78rem;
   line-height: 1.4;
   max-width: none;
+}
+
+[data-section='automation-parameters'] {
+  margin-top: var(--gap-xl);
+}
+
+[data-automation-header] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-md);
+  margin-bottom: var(--gap-sm);
+}
+
+[data-automation-header] h2 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+[data-copy-markdown-button] {
+  flex: 0 0 auto;
+  min-height: 2.25rem;
+  padding: 0 1rem;
+  border: 1px solid var(--separator-strong);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--surface-solid) 86%, transparent);
+  color: var(--label-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+[data-copy-markdown-button]:hover {
+  background: var(--surface-solid);
+  color: var(--label);
+}
+
+[data-section='automation-parameters'] p {
+  max-width: none;
+}
+
+[data-section='automation-parameters'] table {
+  width: 100%;
+  margin: 0 0 var(--gap-lg);
+  border-collapse: collapse;
+  overflow-wrap: anywhere;
+  font-size: 0.86rem;
+}
+
+[data-section='automation-parameters'] th,
+[data-section='automation-parameters'] td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid var(--separator);
+  text-align: left;
+  vertical-align: top;
+}
+
+[data-section='automation-parameters'] th {
+  color: var(--label-tertiary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-section='automation-parameters'] td:first-child,
+[data-section='automation-parameters'] th:first-child {
+  width: 9rem;
+}
+
+[data-section='automation-parameters'] td:nth-child(2),
+[data-section='automation-parameters'] th:nth-child(2) {
+  width: 24rem;
+}
+
+@media (max-width: 760px) {
+  [data-automation-header] {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 }
 
 [data-toolbar-label] {
