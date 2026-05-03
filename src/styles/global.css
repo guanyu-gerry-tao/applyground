@@ -1864,6 +1864,31 @@ input[type='file']::file-selector-button:hover {
 }
 
 @media (max-width: 760px) {
+  [data-job-title-row] {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: 0.4rem;
+    row-gap: 0.18rem;
+    align-items: center;
+  }
+
+  [data-job-title] {
+    grid-column: 2;
+  }
+
+  [data-job-meta] {
+    grid-column: 1 / -1;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+
+  [data-job-meta] span {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
   [data-section='job-index-controls'] {
     grid-template-columns: 1fr;
   }
