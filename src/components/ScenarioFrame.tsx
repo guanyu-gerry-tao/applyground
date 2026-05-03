@@ -322,6 +322,9 @@ export default function ScenarioFrame({ meta, children }: ScenarioFrameProps) {
             </>
           )}
         </details>
+        <span data-styles-hint="">
+          ← Change form types, simulate platform conditions
+        </span>
 
         {renderJobPager('top')}
       </div>

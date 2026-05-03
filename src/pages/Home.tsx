@@ -137,10 +137,10 @@ export default function Home() {
     <section data-page="home">
       <section data-section="home-overview">
         <div data-home-intro="">
-          <h1>Job Application Test Fixtures</h1>
+          <h1>Application Practice Ground</h1>
           <p>
-            Neutral fake jobs and application forms for testing whether your AI agent can read,
-            navigate, and submit local-only JSON results.
+            Static job posts and form scenarios for checking how AI agents read, navigate,
+            and return local-only JSON results.
           </p>
         </div>
       </section>

@@ -27,9 +27,9 @@ export default function App() {
       </main>
       <footer data-app-footer>
         <p>
-          Applyground is a neutral, original fixture set for job-application form automation.
-          It does not replicate any real brand, ATS, or platform. No backend; submissions are
-          local-only and echoed back as JSON.
+          Applyground is an original practice site for job-application automation. It does not
+          replicate any real brand, ATS, or platform. No backend; submissions stay local and are
+          echoed back as JSON.
         </p>
         <p>
           Open source under MIT.{' '}

@@ -769,7 +769,19 @@ code {
 
 /* Collapsed operator styles */
 [data-section='styles'] {
+  display: inline-block;
   margin: 0;
+}
+
+[data-styles-hint] {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.45rem;
+  color: var(--label-tertiary);
+  font-size: 0.78rem;
+  font-weight: 560;
+  line-height: 1.2;
+  vertical-align: middle;
 }
 
 [data-section='styles'] > summary {
@@ -1852,12 +1864,21 @@ input[type='file']::file-selector-button:hover {
   }
 
   [data-jd-controls] {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     gap: var(--gap-sm);
     min-height: 0;
   }
 
+  [data-styles-hint] {
+    margin-left: 0.15rem;
+    max-width: calc(100% - 5.8rem);
+    flex-wrap: wrap;
+  }
+
   [data-jd-controls] [data-job-pager='top'] {
+    width: 100%;
     position: static;
     justify-content: flex-start;
   }
